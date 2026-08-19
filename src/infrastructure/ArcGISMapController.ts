@@ -3,17 +3,24 @@ import Map from '@arcgis/core/Map'
 import Point from '@arcgis/core/geometry/Point'
 import * as projection from '@arcgis/core/geometry/projection'
 import SpatialReference from '@arcgis/core/geometry/SpatialReference'
+import type Layer from '@arcgis/core/layers/Layer'
 import MapView from '@arcgis/core/views/MapView'
 import type { Coordinate } from '../domain/Coordinate'
-import type {
-  CoordinateChangeHandler,
-  IMapService,
-} from '../domain/IMapService'
+import type { IMapService, MapCallbacks } from '../domain/IMapService'
 import {
-  createParkBoundaryLayer,
-  createPoiLayer,
+  createOperationalLayers,
   getEntranceCoordinates,
-} from './parkGeoJsonLayers'
+} from './layers'
+import { toMapFeature } from './mappers/mapFeatureMapper'
+import {
+  clearMapSelection,
+  highlightGraphic,
+  setupLayerList,
+} from './widgets/mapWidgets'
+import {
+  pickBestGraphicHit,
+  resolveGraphicWithAttributes,
+} from './interaction/hitTestUtils'
 
 const WGS84 = new SpatialReference({ wkid: 4326 })
 const MAGNA_SIRGAS_NATIONAL_ORIGIN = new SpatialReference({ wkid: 9377 })
@@ -22,6 +29,8 @@ export class ArcGISMapController implements IMapService {
   private readonly apiKey: string
   private view: MapView | null = null
   private clickHandle: IHandle | null = null
+  private highlightHandle: IHandle | null = null
+  private interactiveLayers: Layer[] = []
   private destroyed = false
 
   constructor(apiKey: string) {
@@ -30,7 +39,7 @@ export class ArcGISMapController implements IMapService {
 
   async initialize(
     container: HTMLDivElement,
-    onCoordinateChange: CoordinateChangeHandler,
+    callbacks: MapCallbacks,
   ): Promise<void> {
     if (!this.apiKey.trim()) {
       throw new Error(
@@ -45,8 +54,8 @@ export class ArcGISMapController implements IMapService {
       return
     }
 
-    const parkLayer = createParkBoundaryLayer()
-    const poiLayer = createPoiLayer()
+    const { layers, poiLayer } = createOperationalLayers()
+    this.interactiveLayers = layers
     const entrance = await getEntranceCoordinates(poiLayer)
 
     if (this.destroyed) {
@@ -55,7 +64,7 @@ export class ArcGISMapController implements IMapService {
 
     const map = new Map({
       basemap: 'topo-vector',
-      layers: [parkLayer, poiLayer],
+      layers: this.interactiveLayers,
     })
 
     this.view = new MapView({
@@ -63,6 +72,7 @@ export class ArcGISMapController implements IMapService {
       map,
       center: [entrance.longitude, entrance.latitude],
       zoom: 17,
+      popupEnabled: false,
     })
 
     await this.view.when()
@@ -71,9 +81,12 @@ export class ArcGISMapController implements IMapService {
       return
     }
 
+    this.view.closePopup()
+
+    setupLayerList(this.view)
+
     this.clickHandle = this.view.on('click', (event) => {
-      const coordinate = this.convertCoordinate(event.mapPoint)
-      onCoordinateChange(coordinate)
+      void this.handleMapClick(event, callbacks)
     })
   }
 
@@ -81,8 +94,49 @@ export class ArcGISMapController implements IMapService {
     this.destroyed = true
     this.clickHandle?.remove()
     this.clickHandle = null
+    this.highlightHandle?.remove()
+    this.highlightHandle = null
     this.view?.destroy()
     this.view = null
+    this.interactiveLayers = []
+  }
+
+  private async handleMapClick(
+    event: __esri.ViewClickEvent,
+    callbacks: MapCallbacks,
+  ): Promise<void> {
+    if (!this.view) {
+      return
+    }
+
+    event.stopPropagation()
+    this.view.closePopup()
+
+    callbacks.onCoordinateChange(this.convertCoordinate(event.mapPoint))
+
+    const hit = await this.view.hitTest(event, {
+      include: this.interactiveLayers,
+    })
+
+    const graphicHit = pickBestGraphicHit(hit.results)
+
+    if (!graphicHit) {
+      this.highlightHandle = clearMapSelection(this.view, this.highlightHandle)
+      callbacks.onFeatureSelect(null)
+      return
+    }
+
+    const layer = graphicHit.layer as __esri.GeoJSONLayer
+    const graphic = await resolveGraphicWithAttributes(layer, graphicHit.graphic)
+
+    this.highlightHandle = await highlightGraphic(
+      this.view,
+      layer,
+      graphic,
+      this.highlightHandle,
+    )
+
+    callbacks.onFeatureSelect(toMapFeature(graphic, layer))
   }
 
   private convertCoordinate(mapPoint: Point): Coordinate {

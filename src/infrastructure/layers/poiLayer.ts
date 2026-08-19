@@ -1,37 +1,9 @@
 import Point from '@arcgis/core/geometry/Point'
 import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
-import SimpleRenderer from '@arcgis/core/renderers/SimpleRenderer'
 import UniqueValueRenderer from '@arcgis/core/renderers/UniqueValueRenderer'
-import SimpleFillSymbol from '@arcgis/core/symbols/SimpleFillSymbol'
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol'
 
-/** GeoJSON solo con polígonos — GeoJSONLayer exige un tipo de geometría por capa. */
-export const PARK_BOUNDARY_GEOJSON_URL = '/data/parque.geojson'
-
-/** GeoJSON solo con puntos — agrega aquí nuevos POIs. */
 export const POIS_GEOJSON_URL = '/data/pois.geojson'
-
-const POPUP_TEMPLATE = {
-  title: '{nombre}',
-  content: '{descripcion}',
-} as const
-
-export function createParkBoundaryLayer(): GeoJSONLayer {
-  return new GeoJSONLayer({
-    url: PARK_BOUNDARY_GEOJSON_URL,
-    title: 'Parque Recreativo Comfama',
-    renderer: new SimpleRenderer({
-      symbol: new SimpleFillSymbol({
-        color: [34, 197, 94, 0.22],
-        outline: {
-          color: '#15803d',
-          width: 2,
-        },
-      }),
-    }),
-    popupTemplate: POPUP_TEMPLATE,
-  })
-}
 
 export function createPoiLayer(): GeoJSONLayer {
   const defaultSymbol = new SimpleMarkerSymbol({
@@ -41,8 +13,11 @@ export function createPoiLayer(): GeoJSONLayer {
   })
 
   return new GeoJSONLayer({
+    id: 'pois',
     url: POIS_GEOJSON_URL,
     title: 'Puntos de interés',
+    listMode: 'show',
+    popupEnabled: false,
     renderer: new UniqueValueRenderer({
       field: 'tipo',
       defaultSymbol,
@@ -73,7 +48,6 @@ export function createPoiLayer(): GeoJSONLayer {
         },
       ],
     }),
-    popupTemplate: POPUP_TEMPLATE,
   })
 }
 

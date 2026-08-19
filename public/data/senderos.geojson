@@ -1,0 +1,41 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Sendero principal",
+        "tipo": "sendero_principal",
+        "descripcion": "Acceso peatonal desde la entrada hacia el interior del parque.",
+        "distancia_m": 320
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-75.382248, 6.139636],
+          [-75.382120, 6.139520],
+          [-75.381950, 6.139280],
+          [-75.381780, 6.139050],
+          [-75.381620, 6.138820]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Acceso universal",
+        "tipo": "acceso_discapacitados",
+        "descripcion": "Ruta pavimentada de acceso desde la entrada principal.",
+        "distancia_m": 85
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-75.382248, 6.139636],
+          [-75.382210, 6.139600],
+          [-75.382180, 6.139560]
+        ]
+      }
+    }
+  ]
+}

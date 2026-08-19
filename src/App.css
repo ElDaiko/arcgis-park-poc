@@ -14,6 +14,7 @@
 }
 
 .coordinate-panel,
+.feature-panel,
 .map-place-label,
 .map-error {
   position: absolute;
@@ -123,9 +124,97 @@
   line-height: 1.5;
 }
 
-.map-place-label {
+.feature-panel {
   bottom: 28px;
   left: 28px;
+  z-index: 3;
+  width: min(360px, calc(100% - 56px));
+  border-radius: 18px;
+  padding: 20px 22px;
+  color: #173323;
+  transition: box-shadow 0.2s ease;
+}
+
+.feature-panel--active {
+  box-shadow: 0 22px 56px rgba(19, 46, 31, 0.22);
+}
+
+.feature-panel__heading {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #dce6df;
+}
+
+.feature-panel__eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: #597263;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.feature-panel h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  color: #173323;
+}
+
+.feature-panel__body {
+  padding-top: 14px;
+}
+
+.feature-panel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.feature-panel__meta span {
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #edf3ee;
+  color: #3d5c48;
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.feature-panel__description {
+  margin: 0;
+  color: #3d5c48;
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.feature-panel__description--muted {
+  color: #6d7f73;
+  font-style: italic;
+}
+
+.feature-panel__hint {
+  margin: 14px 0 0;
+  color: #597263;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* Popup nativo desactivado — solo usamos FeatureDetailPanel (React) */
+.map-shell .esri-popup {
+  display: none !important;
+}
+
+/* LayerList de ArcGIS — esquina superior izquierda */
+.esri-ui-top-left {
+  top: 16px;
+  left: 16px;
+}
+
+.map-place-label {
+  bottom: 28px;
+  right: 24px;
+  left: auto;
   display: grid;
   gap: 3px;
   border-radius: 12px;
@@ -167,9 +256,16 @@
     padding: 17px;
   }
 
-  .map-place-label {
+  .feature-panel {
     bottom: 18px;
     left: 12px;
+    width: calc(100% - 24px);
+    padding: 16px 18px;
+  }
+
+  .map-place-label {
+    bottom: 18px;
+    right: 12px;
   }
 
   .map-error {

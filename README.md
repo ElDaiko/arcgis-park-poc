@@ -1,6 +1,6 @@
 # Natural Park GIS PoC
 
-Prueba de concepto de un mapa interactivo para la **entrada del Parque Recreativo Comfama Tutucán** (Rionegro, Antioquia). El foco está en visualizar la geometría del parque, marcar el punto de acceso y consultar coordenadas en dos sistemas de referencia al hacer clic en el mapa.
+Prueba de concepto de un mapa interactivo para el **Parque Recreativo Comfama Tutucán** (Rionegro, Antioquia). Visualiza el contorno del parque, senderos, puntos de interés, permite activar/desactivar capas, seleccionar elementos con highlight y consultar coordenadas en WGS84 y MAGNA-SIRGAS al hacer clic.
 
 Construido con **Vite**, **React**, **TypeScript** y **ArcGIS Maps SDK for JavaScript** (`@arcgis/core`).
 
@@ -9,54 +9,47 @@ Construido con **Vite**, **React**, **TypeScript** y **ArcGIS Maps SDK for JavaS
 ## Características
 
 - Mapa base topográfico centrado en la entrada del parque (zoom 17).
-- Carga de geometrías desde **GeoJSON** (`parque.geojson` + `pois.geojson`):
-  - **Punto de entrada** (`punto_interes`) — marcador rojo con popup.
-  - **Área del parque** (`zona_principal`) — polígono semitransparente con borde verde.
-- **Conversor de coordenadas al clic**:
-  - **WGS84** (EPSG:4326) → Latitud / Longitud en grados.
-  - **MAGNA-SIRGAS Origen Nacional** (EPSG:9377) → X / Y en metros.
-- Arquitectura limpia: la UI de React no importa `@arcgis/core`; toda la lógica GIS vive en infraestructura.
+- **3 capas GeoJSON** independientes (una geometría por archivo):
+  - `parque.geojson` — polígono del parque
+  - `senderos.geojson` — rutas peatonales (Polyline)
+  - `pois.geojson` — puntos de interés (Point)
+- **Interactividad (Nivel 1):** clic en features → highlight + panel React con detalle (un solo panel, sin popup duplicado de ArcGIS).
+- **LayerList (Nivel 2):** widget nativo para encender/apagar capas (esquina superior izquierda).
+- **Conversor de coordenadas:** WGS84 (EPSG:4326) y MAGNA-SIRGAS Origen Nacional (EPSG:9377) en cada clic.
+- **Clean Architecture:** React no importa `@arcgis/core`.
 
 ---
 
 ## Requisitos previos
 
 - [Node.js](https://nodejs.org/) 20+
-- Una **API Key** de ArcGIS Developer. Obtenerla en [developers.arcgis.com](https://developers.arcgis.com/).
+- **API Key** de [ArcGIS Developer](https://developers.arcgis.com/)
 
 ---
 
 ## Inicio rápido
 
 ```bash
-# Clonar el repositorio
 git clone <url-del-repo>
 cd natural-park-gis-poc
-
-# Instalar dependencias
 npm install
-
-# Configurar la API key
 cp .env.example .env.local
-# Editar .env.local y pegar tu clave:
-# VITE_ARCGIS_API_KEY=tu_api_key_aqui
-
-# Servidor de desarrollo
+# Editar .env.local → VITE_ARCGIS_API_KEY=tu_api_key
 npm run dev
 ```
 
-Abre la URL que muestre Vite (por defecto `http://localhost:5173`).
+Abre `http://localhost:5173`.
 
 ---
 
-## Scripts disponibles
+## Scripts
 
-| Comando           | Descripción                              |
-| ----------------- | ---------------------------------------- |
-| `npm run dev`     | Servidor de desarrollo con HMR           |
-| `npm run build`   | Compilación TypeScript + build de Vite   |
-| `npm run preview` | Vista previa del build de producción     |
-| `npm run lint`    | Análisis estático con Oxlint             |
+| Comando           | Descripción                    |
+| ----------------- | ------------------------------ |
+| `npm run dev`     | Servidor de desarrollo         |
+| `npm run build`   | TypeScript + build producción  |
+| `npm run preview` | Vista previa del build         |
+| `npm run lint`    | Oxlint                         |
 
 ---
 
@@ -64,146 +57,166 @@ Abre la URL que muestre Vite (por defecto `http://localhost:5173`).
 
 ```
 natural-park-gis-poc/
-├── public/
-│   └── data/
-│       └── data/
-│           ├── parque.geojson   # Polígono del parque (solo Polygon)
-│           └── pois.geojson     # Puntos de interés (solo Point)
+├── public/data/
+│   ├── parque.geojson       # Polygon — contorno del parque
+│   ├── senderos.geojson     # LineString — rutas peatonales
+│   └── pois.geojson         # Point — entrada y POIs
 ├── src/
-│   ├── domain/                  # Entidades y contratos (sin dependencias GIS)
-│   │   ├── Coordinate.ts
-│   │   └── IMapService.ts
-│   ├── infrastructure/          # Integración con ArcGIS y carga de datos
-│   │   ├── ArcGISMapController.ts
-│   │   └── parkGeoJsonLayers.ts
-│   ├── presentation/            # Componentes React (sin @arcgis/core)
-│   │   ├── MapComponent.tsx
-│   │   └── CoordinatePanel.tsx
-│   ├── App.tsx
-│   └── main.tsx
-├── .env.example
-└── package.json
+│   ├── domain/
+│   │   ├── Coordinate.ts    # lat/lng + X/Y
+│   │   ├── MapFeature.ts    # feature seleccionado (sin ArcGIS)
+│   │   └── IMapService.ts   # contrato del mapa
+│   ├── infrastructure/
+│   │   ├── ArcGISMapController.ts   # orquestador del mapa
+│   │   ├── layers/                  # fábricas GeoJSONLayer
+│   │   │   ├── parkLayer.ts
+│   │   │   ├── trailsLayer.ts
+│   │   │   ├── poiLayer.ts
+│   │   │   └── index.ts
+│   │   ├── mappers/
+│   │   │   └── mapFeatureMapper.ts  # Graphic → MapFeature
+│   │   └── widgets/
+│   │       └── mapWidgets.ts        # LayerList, highlight, popup
+│   └── presentation/
+│       ├── MapComponent.tsx
+│       ├── CoordinatePanel.tsx
+│       └── FeatureDetailPanel.tsx
+└── .env.example
 ```
 
 ---
 
 ## Arquitectura
 
-El proyecto sigue **Clean Architecture** con tres capas bien separadas:
-
 ```
-┌─────────────────────────────────────────────────────────┐
-│  presentation/                                          │
-│  MapComponent, CoordinatePanel                          │
-│  (React puro — sin imports de @arcgis/core)            │
-└────────────────────────┬────────────────────────────────┘
-                         │ usa IMapService
-┌────────────────────────▼────────────────────────────────┐
-│  domain/                                                │
-│  Coordinate, IMapService                                  │
-│  (interfaces y tipos independientes del SDK)            │
-└────────────────────────┬────────────────────────────────┘
-                         │ implementa
-┌────────────────────────▼────────────────────────────────┐
-│  infrastructure/                                        │
-│  ArcGISMapController, parkGeoJsonLayers                   │
-│  (MapView, projection, GeoJSONLayer, renderers)         │
-└─────────────────────────────────────────────────────────┘
+presentation/          domain/              infrastructure/
+─────────────          ───────              ────────────────
+MapComponent      →    IMapService     ←    ArcGISMapController
+CoordinatePanel        Coordinate            ├── layers/
+FeatureDetailPanel     MapFeature            ├── mappers/
+                                             └── widgets/
 ```
 
 ### Regla principal
 
 > **Prohibido importar `@arcgis/core` en archivos `.tsx`.**
 
-Los componentes de presentación solo conocen las interfaces del dominio (`IMapService`, `Coordinate`). El controlador de infraestructura encapsula mapa, proyección, eventos de clic y gráficos.
+React recibe datos planos (`Coordinate`, `MapFeature`) vía callbacks. ArcGIS vive solo en `infrastructure/`.
+
+### Flujo de un clic en el mapa
+
+```
+Usuario hace clic
+       │
+       ▼
+ArcGISMapController.handleMapClick()
+       │
+       ├── Siempre → convertCoordinate() → CoordinatePanel (WGS84 + EPSG:9377)
+       │
+       └── hitTest() — prioridad: POI > sendero > parque
+               │
+               ├── Sin hit → quita highlight, limpia FeatureDetailPanel
+               │
+               └── Con hit → highlight + query attributes → FeatureDetailPanel
+```
 
 ---
 
-## Datos GeoJSON
+## Capas del mapa
 
-ArcGIS `GeoJSONLayer` **exige un solo tipo de geometría por capa** (solo Points o solo Polygons). Por eso los datos están en dos archivos:
+| Orden | ID | Archivo | Geometría | Estilo |
+| ----- | -- | ------- | --------- | ------ |
+| 1 (abajo) | `parque` | `parque.geojson` | Polygon | Verde semitransparente |
+| 2 | `senderos` | `senderos.geojson` | LineString | Marrón / azul punteado |
+| 3 (arriba) | `pois` | `pois.geojson` | Point | Rojo / azul / amarillo por `tipo` |
 
-| Archivo | Geometría | Contenido |
-| ------- | --------- | --------- |
-| `public/data/parque.geojson` | `Polygon` | Contorno del parque |
-| `public/data/pois.geojson` | `Point` | Entrada y futuros POIs |
-
-Cada capa apunta a su archivo; el estilo se define con `renderer` en `parkGeoJsonLayers.ts`.
+> **Regla ArcGIS:** cada `GeoJSONLayer` admite **un solo tipo de geometría** por archivo.
 
 ### Agregar un POI
 
-Edita `public/data/pois.geojson` y añade una feature:
+Edita `public/data/pois.geojson`:
 
 ```json
 {
   "type": "Feature",
   "properties": {
-    "nombre": "Entrada Tutucán",
-    "tipo": "punto_interes",
-    "descripcion": "Acceso principal al parque Comfama por la Calle 38."
+    "nombre": "Mundo Acuático",
+    "tipo": "atraccion",
+    "descripcion": "Zona de piscinas y toboganes."
   },
   "geometry": {
     "type": "Point",
-    "coordinates": [-75.382248, 6.139636]
+    "coordinates": [-75.381500, 6.138200]
   }
 }
 ```
 
-> **Importante:** GeoJSON usa el orden **`[longitud, latitud]`**, no al revés.
+GeoJSON usa **`[longitud, latitud]`**.
 
-Valores de `tipo` soportados en el renderer: `punto_interes` (rojo), `atraccion` (azul), `servicio` (amarillo).
+### Agregar un sendero
 
-Para actualizar el contorno del parque, edita `public/data/parque.geojson`.
+Edita `public/data/senderos.geojson` con `LineString` y campos `nombre`, `tipo`, `descripcion`, `distancia_m`.
+
+Tipos de sendero: `sendero_principal`, `acceso_discapacitados`.
+
+---
+
+## Interactividad implementada
+
+### Nivel 1 — Popups y highlight
+
+- `view.hitTest()` detecta features bajo el cursor (prioriza la capa más específica).
+- `layerView.highlight()` resalta la geometría seleccionada.
+- `FeatureDetailPanel` (React) muestra nombre, tipo y descripción.
+- Popup nativo de ArcGIS desactivado (`view.popupEnabled: false`) para evitar solapamiento con paneles React.
+
+### Nivel 2 — LayerList
+
+- Widget `LayerList` en la esquina superior izquierda.
+- Cada capa tiene `title` e `id` para identificación.
+- `listMode: 'show'` hace visible la capa en el panel.
 
 ---
 
 ## Conversión de coordenadas
 
-Al hacer clic en cualquier punto del mapa:
+En **cualquier** clic (feature o mapa vacío):
 
-1. ArcGIS devuelve la coordenada del clic en el sistema del mapa.
-2. Se proyecta a **WGS84** (EPSG:4326) → se muestran latitud y longitud en grados.
-3. Se proyecta a **MAGNA-SIRGAS Origen Nacional** (EPSG:9377) → se muestran X e Y en metros.
+1. ArcGIS entrega `event.mapPoint`.
+2. `projection.project()` → EPSG:4326 (grados).
+3. `projection.project()` → EPSG:9377 (metros).
 
-La proyección usa `@arcgis/core/geometry/projection` (`projection.load()` al iniciar y `projection.project()` en cada clic). Los resultados se muestran en el panel flotante `CoordinatePanel`.
+Requiere `@arcgis/core@4.31.6` (`projection.load()` + `projection.project()`).
 
 ---
 
 ## Variables de entorno
 
-| Variable               | Descripción                          | Obligatoria |
-| ---------------------- | ------------------------------------ | ----------- |
-| `VITE_ARCGIS_API_KEY`  | API Key de ArcGIS Developer          | Sí          |
-
-Copia `.env.example` a `.env.local` (o `.env`). Vite expone automáticamente las variables con prefijo `VITE_`.
+| Variable | Descripción | Obligatoria |
+| -------- | ----------- | ----------- |
+| `VITE_ARCGIS_API_KEY` | API Key ArcGIS Developer | Sí |
 
 ---
 
-## Versión de `@arcgis/core`
+## Próximos pasos
 
-El proyecto fija **`@arcgis/core@4.31.6`** de forma intencional. Esta PoC depende del módulo `@arcgis/core/geometry/projection` con las APIs `load()` y `project()`. En versiones más recientes del SDK (5.x) esa API fue reestructurada o removida, por lo que se mantiene la 4.31.x para garantizar la conversión EPSG:4326 → EPSG:9377.
-
----
-
-## Stack tecnológico
-
-- [Vite 8](https://vite.dev/) — bundler y dev server
-- [React 19](https://react.dev/) — UI
-- [TypeScript 6](https://www.typescriptlang.org/) — tipado estático
-- [ArcGIS Maps SDK 4.31](https://developers.arcgis.com/javascript/latest/) — mapa, geometrías y proyección
-- [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) — linting
+- [ ] Capa `infraestructura.geojson` (baños, parqueaderos)
+- [ ] Panel React de filtros por `tipo`
+- [ ] Widget Sketch para dibujar y exportar geometrías
+- [ ] `view.goTo(parkLayer.fullExtent)` para encuadrar todo el parque
+- [ ] SceneView 3D (solo si hay caso de uso claro)
+- [ ] Heatmap de densidad de visitantes
 
 ---
 
-## Próximos pasos (ideas)
+## Stack
 
-- Añadir más capas GeoJSON (senderos, zonas acuáticas, POIs).
-- Centrar el mapa con `view.goTo(polygon.extent)` para encuadrar todo el parque.
-- Sustituir `GraphicsLayer` por `GeoJSONLayer` si crece el volumen de datos.
-- Desplegar en Vercel, Netlify o similar con la API key en variables de entorno.
+- [Vite 8](https://vite.dev/) · [React 19](https://react.dev/) · [TypeScript 6](https://www.typescriptlang.org/)
+- [ArcGIS Maps SDK 4.31](https://developers.arcgis.com/javascript/latest/)
+- [Oxlint](https://oxc.rs/docs/guide/usage/linter.html)
 
 ---
 
 ## Licencia
 
-PoC interna / educativa. Ajusta la licencia según las políticas de tu organización.
+PoC interna / educativa. Ajusta según las políticas de tu organización.
