@@ -3,18 +3,20 @@ import Map from '@arcgis/core/Map'
 import Point from '@arcgis/core/geometry/Point'
 import * as projection from '@arcgis/core/geometry/projection'
 import SpatialReference from '@arcgis/core/geometry/SpatialReference'
-import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer'
 import MapView from '@arcgis/core/views/MapView'
 import type { Coordinate } from '../domain/Coordinate'
 import type {
   CoordinateChangeHandler,
   IMapService,
 } from '../domain/IMapService'
-import { loadComfamaParkData } from './geoJsonLoader'
+import {
+  createParkBoundaryLayer,
+  createPoiLayer,
+  getEntranceCoordinates,
+} from './parkGeoJsonLayers'
 
 const WGS84 = new SpatialReference({ wkid: 4326 })
 const MAGNA_SIRGAS_NATIONAL_ORIGIN = new SpatialReference({ wkid: 9377 })
-const PARK_GEOJSON_URL = '/data/comfama.geojson'
 
 export class ArcGISMapController implements IMapService {
   private readonly apiKey: string
@@ -43,26 +45,23 @@ export class ArcGISMapController implements IMapService {
       return
     }
 
-    const parkData = await loadComfamaParkData(PARK_GEOJSON_URL)
+    const parkLayer = createParkBoundaryLayer()
+    const poiLayer = createPoiLayer()
+    const entrance = await getEntranceCoordinates(poiLayer)
 
     if (this.destroyed) {
       return
     }
 
-    const graphicsLayer = new GraphicsLayer({
-      title: 'Parque Comfama Tutucán',
-      graphics: [parkData.parkAreaGraphic, parkData.entranceGraphic],
-    })
-
     const map = new Map({
       basemap: 'topo-vector',
-      layers: [graphicsLayer],
+      layers: [parkLayer, poiLayer],
     })
 
     this.view = new MapView({
       container,
       map,
-      center: [parkData.entrance.longitude, parkData.entrance.latitude],
+      center: [entrance.longitude, entrance.latitude],
       zoom: 17,
     })
 

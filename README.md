@@ -9,7 +9,7 @@ Construido con **Vite**, **React**, **TypeScript** y **ArcGIS Maps SDK for JavaS
 ## Características
 
 - Mapa base topográfico centrado en la entrada del parque (zoom 17).
-- Carga de geometrías desde **GeoJSON** (`public/data/comfama.geojson`):
+- Carga de geometrías desde **GeoJSON** (`parque.geojson` + `pois.geojson`):
   - **Punto de entrada** (`punto_interes`) — marcador rojo con popup.
   - **Área del parque** (`zona_principal`) — polígono semitransparente con borde verde.
 - **Conversor de coordenadas al clic**:
@@ -66,14 +66,16 @@ Abre la URL que muestre Vite (por defecto `http://localhost:5173`).
 natural-park-gis-poc/
 ├── public/
 │   └── data/
-│       └── comfama.geojson      # Geometrías del parque (entrada + polígono)
+│       └── data/
+│           ├── parque.geojson   # Polígono del parque (solo Polygon)
+│           └── pois.geojson     # Puntos de interés (solo Point)
 ├── src/
 │   ├── domain/                  # Entidades y contratos (sin dependencias GIS)
 │   │   ├── Coordinate.ts
 │   │   └── IMapService.ts
 │   ├── infrastructure/          # Integración con ArcGIS y carga de datos
 │   │   ├── ArcGISMapController.ts
-│   │   └── geoJsonLoader.ts
+│   │   └── parkGeoJsonLayers.ts
 │   ├── presentation/            # Componentes React (sin @arcgis/core)
 │   │   ├── MapComponent.tsx
 │   │   └── CoordinatePanel.tsx
@@ -104,8 +106,8 @@ El proyecto sigue **Clean Architecture** con tres capas bien separadas:
                          │ implementa
 ┌────────────────────────▼────────────────────────────────┐
 │  infrastructure/                                        │
-│  ArcGISMapController, geoJsonLoader                       │
-│  (MapView, projection, GraphicsLayer, fetch GeoJSON)    │
+│  ArcGISMapController, parkGeoJsonLayers                   │
+│  (MapView, projection, GeoJSONLayer, renderers)         │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -119,14 +121,18 @@ Los componentes de presentación solo conocen las interfaces del dominio (`IMapS
 
 ## Datos GeoJSON
 
-El archivo `public/data/comfama.geojson` es un `FeatureCollection` con dos features. El loader (`geoJsonLoader.ts`) los identifica por el campo `properties.tipo`:
+ArcGIS `GeoJSONLayer` **exige un solo tipo de geometría por capa** (solo Points o solo Polygons). Por eso los datos están en dos archivos:
 
-| `tipo`            | Geometría | Uso en el mapa                          |
-| ----------------- | --------- | --------------------------------------- |
-| `punto_interes`   | `Point`   | Marcador rojo de la entrada principal   |
-| `zona_principal`  | `Polygon` | Contorno del área general del parque    |
+| Archivo | Geometría | Contenido |
+| ------- | --------- | --------- |
+| `public/data/parque.geojson` | `Polygon` | Contorno del parque |
+| `public/data/pois.geojson` | `Point` | Entrada y futuros POIs |
 
-### Ejemplo — punto de entrada
+Cada capa apunta a su archivo; el estilo se define con `renderer` en `parkGeoJsonLayers.ts`.
+
+### Agregar un POI
+
+Edita `public/data/pois.geojson` y añade una feature:
 
 ```json
 {
@@ -145,7 +151,9 @@ El archivo `public/data/comfama.geojson` es un `FeatureCollection` con dos featu
 
 > **Importante:** GeoJSON usa el orden **`[longitud, latitud]`**, no al revés.
 
-Para actualizar el mapa, edita o reemplaza `public/data/comfama.geojson` y recarga la aplicación. No hace falta tocar código TypeScript siempre que se respeten los tipos `punto_interes` y `zona_principal`.
+Valores de `tipo` soportados en el renderer: `punto_interes` (rojo), `atraccion` (azul), `servicio` (amarillo).
+
+Para actualizar el contorno del parque, edita `public/data/parque.geojson`.
 
 ---
 
