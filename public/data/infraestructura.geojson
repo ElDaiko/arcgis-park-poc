@@ -17,19 +17,6 @@
     {
       "type": "Feature",
       "properties": {
-        "nombre": "Parqueadero Calle 38",
-        "tipo": "parqueadero",
-        "descripcion": "Estacionamiento de visitantes frente a la entrada principal.",
-        "imagen": "/images/parqueadero.svg"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [-75.382320, 6.139780]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "nombre": "Primeros auxilios",
         "tipo": "primeros_auxilios",
         "descripcion": "Puesto de atención primaria y botiquín en zona de acceso.",

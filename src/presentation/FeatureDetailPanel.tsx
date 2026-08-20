@@ -1,56 +1,78 @@
-import type { MapFeature } from '../domain/MapFeature'
+import {
+  formatCategoryLabel,
+  type MapFeature,
+} from '../domain/MapFeature'
 
 interface FeatureDetailPanelProps {
-  feature: MapFeature | null
+  feature: MapFeature
+  onClose: () => void
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  punto_interes: 'Punto de interés',
-  atraccion: 'Atracción',
-  servicio: 'Servicio',
-  zona_principal: 'Zona principal',
-  sendero_principal: 'Sendero principal',
-  acceso_discapacitados: 'Acceso universal',
-  bano: 'Baños',
-  parqueadero: 'Parqueadero',
-  primeros_auxilios: 'Primeros auxilios',
-  informacion: 'Información',
+const CATEGORY_CHIP_CLASS: Record<string, string> = {
+  atraccion: 'feature-panel__chip--atraccion',
+  gastronomia: 'feature-panel__chip--gastronomia',
+  acuatico: 'feature-panel__chip--acuatico',
+  deporte: 'feature-panel__chip--deporte',
+  servicio: 'feature-panel__chip--servicio',
 }
 
-function formatType(type: string): string {
-  return TYPE_LABELS[type] ?? type
+function getPrimaryChip(feature: MapFeature): {
+  label: string
+  className: string
+} {
+  if (feature.category) {
+    return {
+      label: formatCategoryLabel(feature.category),
+      className:
+        CATEGORY_CHIP_CLASS[feature.category] ??
+        'feature-panel__chip--primary',
+    }
+  }
+
+  return {
+    label: formatCategoryLabel(feature.type),
+    className: 'feature-panel__chip--primary',
+  }
 }
 
-/** Evita duplicar chip de capa cuando ya lo dice el tipo (ej. POI + "Puntos de interés"). */
 function getLayerBadge(feature: MapFeature): string | null {
-  const typeLabel = formatType(feature.type)
+  const primary = getPrimaryChip(feature).label
   const layerTitle = feature.layerTitle.trim()
 
   if (!layerTitle) {
     return null
   }
 
-  if (layerTitle.toLowerCase() === typeLabel.toLowerCase()) {
+  if (layerTitle.toLowerCase() === primary.toLowerCase()) {
     return null
   }
 
-  const poiTypes = new Set(['punto_interes', 'atraccion', 'servicio'])
-  if (poiTypes.has(feature.type) && layerTitle === 'Puntos de interés') {
+  if (feature.category && layerTitle === 'Puntos de interés') {
     return null
   }
 
   return layerTitle
 }
 
-export function FeatureDetailPanel({ feature }: FeatureDetailPanelProps) {
-  const layerBadge = feature ? getLayerBadge(feature) : null
+export function FeatureDetailPanel({
+  feature,
+  onClose,
+}: FeatureDetailPanelProps) {
+  const layerBadge = getLayerBadge(feature)
+  const primaryChip = getPrimaryChip(feature)
 
   return (
-    <aside
-      className={`feature-panel${feature ? ' feature-panel--active' : ''}`}
-      aria-live="polite"
-    >
-      {feature?.imageUrl && (
+    <aside className="feature-panel feature-panel--active" aria-live="polite">
+      <button
+        type="button"
+        className="feature-panel__close"
+        onClick={onClose}
+        aria-label="Cerrar detalle"
+      >
+        ×
+      </button>
+
+      {feature.imageUrl && (
         <div className="feature-panel__media">
           <img
             src={feature.imageUrl}
@@ -64,36 +86,28 @@ export function FeatureDetailPanel({ feature }: FeatureDetailPanelProps) {
       <div className="feature-panel__content">
         <div className="feature-panel__heading">
           <span className="feature-panel__eyebrow">Elemento seleccionado</span>
-          <h2>{feature ? feature.name : 'Selecciona un elemento'}</h2>
+          <h2>{feature.name}</h2>
         </div>
 
-        {feature ? (
-          <div className="feature-panel__body">
-            <p className="feature-panel__meta">
-              <span className="feature-panel__chip feature-panel__chip--primary">
-                {formatType(feature.type)}
+        <div className="feature-panel__body">
+          <p className="feature-panel__meta">
+            <span className={`feature-panel__chip ${primaryChip.className}`}>
+              {primaryChip.label}
+            </span>
+            {layerBadge && (
+              <span className="feature-panel__chip feature-panel__chip--secondary">
+                {layerBadge}
               </span>
-              {layerBadge && (
-                <span className="feature-panel__chip feature-panel__chip--secondary">
-                  {layerBadge}
-                </span>
-              )}
-            </p>
-            {feature.description ? (
-              <p className="feature-panel__description">{feature.description}</p>
-            ) : (
-              <p className="feature-panel__description feature-panel__description--muted">
-                Sin descripción disponible.
-              </p>
             )}
-          </div>
-        ) : (
-          <p className="feature-panel__hint">
-            Haz clic en el parque, un sendero o un punto de interés para ver su
-            detalle e imagen. Activa o desactiva capas con el panel superior
-            izquierdo.
           </p>
-        )}
+          {feature.description ? (
+            <p className="feature-panel__description">{feature.description}</p>
+          ) : (
+            <p className="feature-panel__description feature-panel__description--muted">
+              Sin descripción disponible.
+            </p>
+          )}
+        </div>
       </div>
     </aside>
   )

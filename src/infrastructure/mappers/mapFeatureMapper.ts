@@ -1,19 +1,9 @@
 import type Graphic from '@arcgis/core/Graphic'
 import type Layer from '@arcgis/core/layers/Layer'
-import type { MapFeature } from '../../domain/MapFeature'
-
-const TYPE_LABELS: Record<string, string> = {
-  punto_interes: 'Punto de interés',
-  atraccion: 'Atracción',
-  servicio: 'Servicio',
-  zona_principal: 'Zona principal',
-  sendero_principal: 'Sendero principal',
-  acceso_discapacitados: 'Acceso universal',
-  bano: 'Baños',
-  parqueadero: 'Parqueadero',
-  primeros_auxilios: 'Primeros auxilios',
-  informacion: 'Información',
-}
+import {
+  formatCategoryLabel,
+  type MapFeature,
+} from '../../domain/MapFeature'
 
 function readAttribute(
   attributes: Record<string, unknown>,
@@ -33,16 +23,21 @@ function readAttribute(
 
 export function toMapFeature(graphic: Graphic, layer: Layer): MapFeature {
   const attributes = graphic.attributes as Record<string, unknown>
-  const type = readAttribute(attributes, 'tipo')
+  const category = readAttribute(attributes, 'categoria')
+  const type =
+    category ||
+    readAttribute(attributes, 'tipo') ||
+    'desconocido'
   const name =
     readAttribute(attributes, 'nombre') ||
     readAttribute(attributes, 'name') ||
-    TYPE_LABELS[type] ||
+    formatCategoryLabel(type) ||
     'Sin nombre'
 
   return {
     name,
-    type: type || 'desconocido',
+    type,
+    category: category || undefined,
     description: readAttribute(attributes, 'descripcion'),
     layerTitle: layer.title ?? 'Capa',
     imageUrl: readAttribute(attributes, 'imagen') || undefined,

@@ -4,18 +4,22 @@ import Point from '@arcgis/core/geometry/Point'
 import * as projection from '@arcgis/core/geometry/projection'
 import SpatialReference from '@arcgis/core/geometry/SpatialReference'
 import type Layer from '@arcgis/core/layers/Layer'
+import type GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
 import MapView from '@arcgis/core/views/MapView'
 import type { Coordinate } from '../domain/Coordinate'
 import type { IMapService, MapCallbacks } from '../domain/IMapService'
+import type { PoiCategory } from '../domain/PoiCategory'
 import {
   createOperationalLayers,
   getEntranceCoordinates,
 } from './layers'
+import { buildPoiCategoryExpression } from './filters/poiCategoryFilter'
 import { toMapFeature } from './mappers/mapFeatureMapper'
 import {
   clearMapSelection,
   highlightGraphic,
   setupLayerList,
+  setupLegend,
 } from './widgets/mapWidgets'
 import {
   pickBestGraphicHit,
@@ -28,6 +32,7 @@ const MAGNA_SIRGAS_NATIONAL_ORIGIN = new SpatialReference({ wkid: 9377 })
 export class ArcGISMapController implements IMapService {
   private readonly apiKey: string
   private view: MapView | null = null
+  private poiLayer: GeoJSONLayer | null = null
   private clickHandle: IHandle | null = null
   private highlightHandle: IHandle | null = null
   private interactiveLayers: Layer[] = []
@@ -56,6 +61,7 @@ export class ArcGISMapController implements IMapService {
 
     const { layers, poiLayer } = createOperationalLayers()
     this.interactiveLayers = layers
+    this.poiLayer = poiLayer
     const entrance = await getEntranceCoordinates(poiLayer)
 
     if (this.destroyed) {
@@ -71,7 +77,7 @@ export class ArcGISMapController implements IMapService {
       container,
       map,
       center: [entrance.longitude, entrance.latitude],
-      zoom: 17,
+      zoom: 16,
       popupEnabled: false,
     })
 
@@ -84,10 +90,40 @@ export class ArcGISMapController implements IMapService {
     this.view.closePopup()
 
     setupLayerList(this.view)
+    setupLegend(this.view, poiLayer)
+
+    const parkLayer = layers.find((layer) => layer.id === 'parque') as
+      | __esri.GeoJSONLayer
+      | undefined
+
+    if (parkLayer) {
+      await parkLayer.when()
+      if (!this.destroyed && this.view && parkLayer.fullExtent) {
+        void this.view.goTo(parkLayer.fullExtent.expand(1.15), {
+          duration: 900,
+        })
+      }
+    }
 
     this.clickHandle = this.view.on('click', (event) => {
       void this.handleMapClick(event, callbacks)
     })
+  }
+
+  setPoiCategoryFilter(categories: readonly PoiCategory[]): void {
+    if (!this.poiLayer) {
+      return
+    }
+
+    this.poiLayer.definitionExpression = buildPoiCategoryExpression(categories)
+  }
+
+  clearSelection(): void {
+    if (!this.view) {
+      return
+    }
+
+    this.highlightHandle = clearMapSelection(this.view, this.highlightHandle)
   }
 
   destroy(): void {
@@ -98,6 +134,7 @@ export class ArcGISMapController implements IMapService {
     this.highlightHandle = null
     this.view?.destroy()
     this.view = null
+    this.poiLayer = null
     this.interactiveLayers = []
   }
 
@@ -137,6 +174,16 @@ export class ArcGISMapController implements IMapService {
     )
 
     callbacks.onFeatureSelect(toMapFeature(graphic, layer))
+
+    if (graphic.geometry) {
+      void this.view.goTo(
+        {
+          target: graphic.geometry,
+          zoom: Math.max(this.view.zoom, 18),
+        },
+        { duration: 600 },
+      )
+    }
   }
 
   private convertCoordinate(mapPoint: Point): Coordinate {

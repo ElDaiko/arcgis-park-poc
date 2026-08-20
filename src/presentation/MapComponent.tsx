@@ -2,14 +2,21 @@ import { useEffect, useRef, useState } from 'react'
 import type { Coordinate } from '../domain/Coordinate'
 import type { MapFeature } from '../domain/MapFeature'
 import type { IMapService } from '../domain/IMapService'
+import type { PoiCategory } from '../domain/PoiCategory'
+import { POI_CATEGORIES } from '../domain/PoiCategory'
 import { ArcGISMapController } from '../infrastructure/ArcGISMapController'
+import { CategoryFilterPanel } from './CategoryFilterPanel'
 import { CoordinatePanel } from './CoordinatePanel'
 import { FeatureDetailPanel } from './FeatureDetailPanel'
 
 export function MapComponent() {
   const mapContainerRef = useRef<HTMLDivElement>(null)
+  const mapServiceRef = useRef<IMapService | null>(null)
   const [coordinate, setCoordinate] = useState<Coordinate | null>(null)
   const [selectedFeature, setSelectedFeature] = useState<MapFeature | null>(null)
+  const [activeCategories, setActiveCategories] = useState<PoiCategory[]>([
+    ...POI_CATEGORIES,
+  ])
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -22,6 +29,7 @@ export function MapComponent() {
     const mapService: IMapService = new ArcGISMapController(
       import.meta.env.VITE_ARCGIS_API_KEY ?? '',
     )
+    mapServiceRef.current = mapService
 
     void mapService
       .initialize(container, {
@@ -38,8 +46,27 @@ export function MapComponent() {
 
     return () => {
       mapService.destroy()
+      mapServiceRef.current = null
     }
   }, [])
+
+  const handleCategoryChange = (categories: PoiCategory[]) => {
+    setActiveCategories(categories)
+    mapServiceRef.current?.setPoiCategoryFilter(categories)
+
+    if (
+      selectedFeature?.category &&
+      !categories.includes(selectedFeature.category as PoiCategory)
+    ) {
+      setSelectedFeature(null)
+      mapServiceRef.current?.clearSelection()
+    }
+  }
+
+  const handleCloseFeature = () => {
+    setSelectedFeature(null)
+    mapServiceRef.current?.clearSelection()
+  }
 
   return (
     <main className="map-shell">
@@ -48,18 +75,21 @@ export function MapComponent() {
         className="map-container"
         aria-label="Mapa de la entrada al Parque Tutucán"
       />
+      <CategoryFilterPanel
+        selected={activeCategories}
+        onChange={handleCategoryChange}
+      />
       <CoordinatePanel coordinate={coordinate} />
-      <FeatureDetailPanel feature={selectedFeature} />
+      {selectedFeature && (
+        <FeatureDetailPanel
+          feature={selectedFeature}
+          onClose={handleCloseFeature}
+        />
+      )}
       {error && (
         <div className="map-error" role="alert">
           <strong>Error al inicializar el mapa</strong>
           <span>{error}</span>
-        </div>
-      )}
-      {!selectedFeature && (
-        <div className="map-place-label" aria-hidden="true">
-          <span>PoC GIS</span>
-          <strong>Entrada Parque Tutucán</strong>
         </div>
       )}
     </main>

@@ -134,18 +134,17 @@ ArcGISMapController.handleMapClick()
 | 1 (abajo) | `parque` | `parque.geojson` | Polygon | Verde semitransparente |
 | 2 | `senderos` | `senderos.geojson` | LineString | Marrón / azul punteado |
 | 3 | `infraestructura` | `infraestructura.geojson` | Point | Pins Esri por `tipo` |
-| 4 (arriba) | `pois` | `pois.geojson` | Point | Círculos por `tipo` |
+| 4 (arriba) | `pois` | `pois.geojson` | Point | Pins Esri por `categoria` |
 
-### Pins Esri (infraestructura)
+### Categorías de POIs (`categoria`)
 
-| `tipo` | Pin |
-| ------ | --- |
-| `bano` | Amarillo |
-| `parqueadero` | Verde |
-| `primeros_auxilios` | Rojo |
-| `informacion` | Naranja |
-
-Definidos en `infrastructure/layers/symbols/esriPins.ts` con `PictureMarkerSymbol`.
+| Valor | Pin | Contenido |
+| ----- | --- | --------- |
+| `atraccion` | Rojo | Rueda, Megadrop, Granja, tren, etc. |
+| `gastronomia` | Naranja | Doña Rita, Fonda de Suso, artesanías |
+| `acuatico` | Azul | Lago, nauticos, piscinas, tobogán |
+| `deporte` | Verde | Gimnasio, canchas de tenis |
+| `servicio` | Amarillo | Entrada, parqueadero, cajero, instalaciones |
 
 > **Regla ArcGIS:** cada `GeoJSONLayer` admite **un solo tipo de geometría** por archivo.
 
@@ -157,18 +156,16 @@ Edita `public/data/pois.geojson`:
 {
   "type": "Feature",
   "properties": {
-    "nombre": "Mundo Acuático",
-    "tipo": "atraccion",
-    "descripcion": "Zona de piscinas y toboganes."
+    "nombre": "La Granja City Farm",
+    "categoria": "atraccion",
+    "descripcion": "Espacio de interacción con animales."
   },
   "geometry": {
     "type": "Point",
-    "coordinates": [-75.381500, 6.138200]
+    "coordinates": [-75.382322, 6.138482]
   }
 }
 ```
-
-GeoJSON usa **`[longitud, latitud]`**.
 
 Campo opcional **`imagen`**: URL de foto del lugar (local en `public/images/` o externa). Se muestra en `FeatureDetailPanel` al seleccionar el elemento.
 
@@ -176,6 +173,7 @@ Campo opcional **`imagen`**: URL de foto del lugar (local en `public/images/` o 
 "imagen": "/images/entrada.jpg"
 ```
 
+Categorías válidas: `atraccion`, `gastronomia`, `acuatico`, `deporte`, `servicio`.
 ### Agregar un sendero
 
 Edita `public/data/senderos.geojson` con `LineString` y campos `nombre`, `tipo`, `descripcion`, `distancia_m`.
@@ -211,8 +209,12 @@ Tipos soportados: `bano`, `parqueadero`, `primeros_auxilios`, `informacion`.
 
 - `view.hitTest()` detecta features bajo el cursor (prioriza la capa más específica).
 - `layerView.highlight()` resalta la geometría seleccionada.
-- `FeatureDetailPanel` (React) muestra nombre, tipo y descripción.
-- Popup nativo de ArcGIS desactivado (`view.popupEnabled: false`) para evitar solapamiento con paneles React.
+- `FeatureDetailPanel` (React) muestra nombre, categoría y descripción (popup nativo desactivado para evitar solapes).
+- Al seleccionar un POI, la cámara hace `goTo` con animación.
+- Etiquetas de nombre visibles al acercar el zoom.
+- Leyenda de categorías (widget Expand, esquina inferior derecha).
+- **Filtro React por categoría** (`CategoryFilterPanel`): checkboxes que aplican `definitionExpression` sobre la capa de POIs sin saturar el LayerList.
+- Popup nativo de ArcGIS desactivado (`view.popupEnabled: false`); el `PopupTemplate` queda definido en la capa por si se rehabilita.
 
 ### Nivel 2 — LayerList
 
@@ -245,7 +247,7 @@ Requiere `@arcgis/core@4.31.6` (`projection.load()` + `projection.project()`).
 ## Próximos pasos
 
 - [x] Capa `infraestructura.geojson` (baños, parqueaderos) con pins Esri
-- [ ] Panel React de filtros por `tipo`
+- [x] Panel React de filtros por categoría (`CategoryFilterPanel`)
 - [ ] Widget Sketch para dibujar y exportar geometrías
 - [ ] `view.goTo(parkLayer.fullExtent)` para encuadrar todo el parque
 - [ ] SceneView 3D (solo si hay caso de uso claro)

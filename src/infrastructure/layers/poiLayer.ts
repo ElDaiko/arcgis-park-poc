@@ -1,53 +1,88 @@
-import Point from '@arcgis/core/geometry/Point'
+import LabelClass from '@arcgis/core/layers/support/LabelClass'
 import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
+import Point from '@arcgis/core/geometry/Point'
+import PopupTemplate from '@arcgis/core/PopupTemplate'
 import UniqueValueRenderer from '@arcgis/core/renderers/UniqueValueRenderer'
-import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol'
+import TextSymbol from '@arcgis/core/symbols/TextSymbol'
+import { createEsriPinSymbol } from './symbols/esriPins'
 
 export const POIS_GEOJSON_URL = '/data/pois.geojson'
 
+/**
+ * Categorías del parque (campo `categoria` en pois.geojson):
+ * atraccion | gastronomia | acuatico | deporte | servicio
+ */
 export function createPoiLayer(): GeoJSONLayer {
-  const defaultSymbol = new SimpleMarkerSymbol({
-    color: '#64525a',
-    size: 10,
-    outline: { color: '#ffffff', width: 2 },
-  })
-
   return new GeoJSONLayer({
     id: 'pois',
     url: POIS_GEOJSON_URL,
     title: 'Puntos de interés',
     listMode: 'show',
     popupEnabled: false,
+    outFields: ['*'],
     renderer: new UniqueValueRenderer({
-      field: 'tipo',
-      defaultSymbol,
+      field: 'categoria',
+      defaultSymbol: createEsriPinSymbol('blue', 24),
       uniqueValueInfos: [
         {
-          value: 'punto_interes',
-          symbol: new SimpleMarkerSymbol({
-            color: '#db0061',
-            size: 12,
-            outline: { color: '#ffffff', width: 2 },
-          }),
+          value: 'atraccion',
+          label: 'Atracción',
+          symbol: createEsriPinSymbol('red', 28),
         },
         {
-          value: 'atraccion',
-          symbol: new SimpleMarkerSymbol({
-            color: '#008444',
-            size: 11,
-            outline: { color: '#ffffff', width: 2 },
-          }),
+          value: 'gastronomia',
+          label: 'Gastronomía',
+          symbol: createEsriPinSymbol('orange', 26),
+        },
+        {
+          value: 'acuatico',
+          label: 'Acuático',
+          symbol: createEsriPinSymbol('blue', 26),
+        },
+        {
+          value: 'deporte',
+          label: 'Deporte',
+          symbol: createEsriPinSymbol('green', 26),
         },
         {
           value: 'servicio',
-          symbol: new SimpleMarkerSymbol({
-            color: '#ae004b',
-            size: 10,
-            outline: { color: '#ffffff', width: 2 },
-          }),
+          label: 'Servicio',
+          symbol: createEsriPinSymbol('yellow', 26),
         },
       ],
     }),
+    popupTemplate: new PopupTemplate({
+      title: '{nombre}',
+      content: `
+        <div style="font-family: 'Source Sans 3', system-ui, sans-serif; padding: 4px 0;">
+          <p style="margin: 0 0 8px; display: inline-block; padding: 4px 12px; border-radius: 999px; background: #fce3ed; color: #ae004b; font-size: 12px; font-weight: 600;">
+            {categoria}
+          </p>
+          <p style="margin: 0; color: #5b3f45; font-size: 15px; line-height: 1.5;">
+            {descripcion}
+          </p>
+        </div>
+      `,
+    }),
+    labelingInfo: [
+      new LabelClass({
+        labelExpressionInfo: {
+          expression: '$feature.nombre',
+        },
+        symbol: new TextSymbol({
+          color: '#1b1c1c',
+          haloColor: '#ffffff',
+          haloSize: 1.5,
+          font: {
+            family: 'Source Sans 3',
+            size: 10,
+            weight: 'bold',
+          },
+        }),
+        labelPlacement: 'above-center',
+        minScale: 8000,
+      }),
+    ],
   })
 }
 
@@ -57,7 +92,7 @@ export async function getEntranceCoordinates(
   await poiLayer.load()
 
   const result = await poiLayer.queryFeatures({
-    where: "tipo = 'punto_interes'",
+    where: "nombre = 'Entrada Tutucán'",
     returnGeometry: true,
     outFields: ['nombre'],
   })
@@ -66,7 +101,7 @@ export async function getEntranceCoordinates(
 
   if (!entrance || entrance.type !== 'point') {
     throw new Error(
-      'pois.geojson no contiene un punto de entrada (tipo = punto_interes).',
+      "pois.geojson no contiene el punto 'Entrada Tutucán'.",
     )
   }
 

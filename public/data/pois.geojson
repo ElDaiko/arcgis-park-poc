@@ -5,13 +5,289 @@
       "type": "Feature",
       "properties": {
         "nombre": "Entrada Tutucán",
-        "tipo": "punto_interes",
+        "categoria": "servicio",
         "descripcion": "Acceso principal al parque Comfama por la Calle 38.",
         "imagen": "/images/entrada.png"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [-75.382248, 6.139636]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "La Granja City Farm",
+        "categoria": "atraccion",
+        "descripcion": "Espacio de interacción con animales y actividades agropecuarias."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38232218880205, 6.138482305330682]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Lago del parque Comfama",
+        "categoria": "acuatico",
+        "descripcion": "Cuerpo de agua central del parque, ideal para paseos y descanso."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38050654005123, 6.138277293968777]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Instalaciones Comfama",
+        "categoria": "servicio",
+        "descripcion": "Área de instalaciones administrativas y de soporte del parque."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.37881117087065, 6.138482305330682]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Rueda Comfama",
+        "categoria": "atraccion",
+        "descripcion": "Rueda panorámica con vistas al parque y sus alrededores."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.3789314504409, 6.138841075024206]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Prescolar Comfama",
+        "categoria": "servicio",
+        "descripcion": "Espacio educativo y de cuidado infantil dentro del parque."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.3787882604763, 6.1375198901975985]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Carros chocones",
+        "categoria": "atraccion",
+        "descripcion": "Atracción clásica de carros chocones para toda la familia."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38072991639598, 6.136551778546583]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Gimnasio Comfama",
+        "categoria": "deporte",
+        "descripcion": "Zona de acondicionamiento físico y bienestar."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.37924074076437, 6.136335376878197]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Nauticos",
+        "categoria": "acuatico",
+        "descripcion": "Actividades náuticas y recreación en el agua."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38037480528382, 6.1397807087906635]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "El Faro",
+        "categoria": "atraccion",
+        "descripcion": "Punto de referencia y atracción emblemática del parque."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38020212079265, 6.139317278864148]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Estación de Tren",
+        "categoria": "atraccion",
+        "descripcion": "Estación del tren recreativo que recorre el parque."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38131504033277, 6.139599883510527]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Gratitud artesanal",
+        "categoria": "gastronomia",
+        "descripcion": "Espacio de artesanías y productos locales."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38250001949619, 6.138783911938495]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Doña Rita",
+        "categoria": "gastronomia",
+        "descripcion": "Punto gastronómico con sabores tradicionales."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38250001949619, 6.138111231996501]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "La Fonda de Suso",
+        "categoria": "gastronomia",
+        "descripcion": "Fonda típica para comida y descanso."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38228384088049, 6.138230642699098]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Cajero Bancolombia",
+        "categoria": "servicio",
+        "descripcion": "Cajero automático disponible para visitantes."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.3823091749732, 6.1392073208354185]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Parqueadero",
+        "categoria": "servicio",
+        "descripcion": "Estacionamiento de visitantes cerca de la entrada."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38209114767476, 6.139660143557532]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Barco Vikingo",
+        "categoria": "atraccion",
+        "descripcion": "Atracción temática tipo barco vikingo."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.3816417691874, 6.1397962311620855]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Juegos Mecánicos",
+        "categoria": "atraccion",
+        "descripcion": "Zona de juegos mecánicos para niños y familias."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.37966734952168, 6.137123817661677]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Megadrop",
+        "categoria": "atraccion",
+        "descripcion": "Atracción de caída libre para amantes de la adrenalina."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.37961197868, 6.138271860701398]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Zona extrema",
+        "categoria": "atraccion",
+        "descripcion": "Área de atracciones de alto impacto y adrenalina."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.37886274823921, 6.138700762480658]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Tobogán infantil",
+        "categoria": "acuatico",
+        "descripcion": "Tobogán acuático pensado para los más pequeños."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.37993632087247, 6.139477944523923]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Piscina para niños",
+        "categoria": "acuatico",
+        "descripcion": "Piscina segura y recreativa para niños."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.37945679892589, 6.139473617628227]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Avión Ícaro",
+        "categoria": "atraccion",
+        "descripcion": "Atracción temática de vuelo y aventura."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.38137606067919, 6.139488957478008]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Canchas de tenis",
+        "categoria": "deporte",
+        "descripcion": "Canchas deportivas para práctica de tenis."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.37886350374093, 6.136523247915655]
       }
     }
   ]
