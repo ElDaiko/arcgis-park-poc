@@ -271,7 +271,8 @@
       "properties": {
         "nombre": "Avión Ícaro",
         "categoria": "atraccion",
-        "descripcion": "Atracción temática de vuelo y aventura."
+        "descripcion": "Atracción temática de vuelo y aventura.",
+        "imagen": "/images/avion-icaro.png"
       },
       "geometry": {
         "type": "Point",
