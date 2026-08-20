@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#d1fae5"/>
+  <rect x="140" y="100" width="360" height="160" rx="8" fill="#6b7280"/>
+  <rect x="160" y="120" width="80" height="60" rx="4" fill="#22c55e"/>
+  <rect x="260" y="120" width="80" height="60" rx="4" fill="#22c55e"/>
+  <rect x="360" y="120" width="80" height="60" rx="4" fill="#16a34a"/>
+  <text x="320" y="310" text-anchor="middle" fill="#14532d" font-family="system-ui,sans-serif" font-size="20" font-weight="600">Parqueadero visitantes</text>
+</svg>

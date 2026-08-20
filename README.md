@@ -9,14 +9,16 @@ Construido con **Vite**, **React**, **TypeScript** y **ArcGIS Maps SDK for JavaS
 ## Características
 
 - Mapa base topográfico centrado en la entrada del parque (zoom 17).
-- **3 capas GeoJSON** independientes (una geometría por archivo):
+- **4 capas GeoJSON** independientes (una geometría por archivo):
   - `parque.geojson` — polígono del parque
   - `senderos.geojson` — rutas peatonales (Polyline)
+  - `infraestructura.geojson` — baños, parqueaderos, etc. (Point + pins Esri)
   - `pois.geojson` — puntos de interés (Point)
 - **Interactividad (Nivel 1):** clic en features → highlight + panel React con detalle (un solo panel, sin popup duplicado de ArcGIS).
 - **LayerList (Nivel 2):** widget nativo para encender/apagar capas (esquina superior izquierda).
 - **Conversor de coordenadas:** WGS84 (EPSG:4326) y MAGNA-SIRGAS Origen Nacional (EPSG:9377) en cada clic.
 - **Clean Architecture:** React no importa `@arcgis/core`.
+- **Design system:** UI basada en *Vitality & Social Connection* (magenta `#DB0061`, verde `#008444`, tipografía Plus Jakarta Sans + Source Sans 3).
 
 ---
 
@@ -60,6 +62,7 @@ natural-park-gis-poc/
 ├── public/data/
 │   ├── parque.geojson       # Polygon — contorno del parque
 │   ├── senderos.geojson     # LineString — rutas peatonales
+│   ├── infraestructura.geojson  # Point — baños, parqueadero, etc.
 │   └── pois.geojson         # Point — entrada y POIs
 ├── src/
 │   ├── domain/
@@ -71,7 +74,9 @@ natural-park-gis-poc/
 │   │   ├── layers/                  # fábricas GeoJSONLayer
 │   │   │   ├── parkLayer.ts
 │   │   │   ├── trailsLayer.ts
+│   │   │   ├── infrastructureLayer.ts
 │   │   │   ├── poiLayer.ts
+│   │   │   ├── symbols/esriPins.ts
 │   │   │   └── index.ts
 │   │   ├── mappers/
 │   │   │   └── mapFeatureMapper.ts  # Graphic → MapFeature
@@ -113,7 +118,7 @@ ArcGISMapController.handleMapClick()
        │
        ├── Siempre → convertCoordinate() → CoordinatePanel (WGS84 + EPSG:9377)
        │
-       └── hitTest() — prioridad: POI > sendero > parque
+       └── hitTest() — prioridad: POI > infraestructura > sendero > parque
                │
                ├── Sin hit → quita highlight, limpia FeatureDetailPanel
                │
@@ -128,7 +133,19 @@ ArcGISMapController.handleMapClick()
 | ----- | -- | ------- | --------- | ------ |
 | 1 (abajo) | `parque` | `parque.geojson` | Polygon | Verde semitransparente |
 | 2 | `senderos` | `senderos.geojson` | LineString | Marrón / azul punteado |
-| 3 (arriba) | `pois` | `pois.geojson` | Point | Rojo / azul / amarillo por `tipo` |
+| 3 | `infraestructura` | `infraestructura.geojson` | Point | Pins Esri por `tipo` |
+| 4 (arriba) | `pois` | `pois.geojson` | Point | Círculos por `tipo` |
+
+### Pins Esri (infraestructura)
+
+| `tipo` | Pin |
+| ------ | --- |
+| `bano` | Amarillo |
+| `parqueadero` | Verde |
+| `primeros_auxilios` | Rojo |
+| `informacion` | Naranja |
+
+Definidos en `infrastructure/layers/symbols/esriPins.ts` con `PictureMarkerSymbol`.
 
 > **Regla ArcGIS:** cada `GeoJSONLayer` admite **un solo tipo de geometría** por archivo.
 
@@ -153,11 +170,38 @@ Edita `public/data/pois.geojson`:
 
 GeoJSON usa **`[longitud, latitud]`**.
 
+Campo opcional **`imagen`**: URL de foto del lugar (local en `public/images/` o externa). Se muestra en `FeatureDetailPanel` al seleccionar el elemento.
+
+```json
+"imagen": "/images/entrada.jpg"
+```
+
 ### Agregar un sendero
 
 Edita `public/data/senderos.geojson` con `LineString` y campos `nombre`, `tipo`, `descripcion`, `distancia_m`.
 
 Tipos de sendero: `sendero_principal`, `acceso_discapacitados`.
+
+### Agregar infraestructura
+
+Edita `public/data/infraestructura.geojson`:
+
+```json
+{
+  "type": "Feature",
+  "properties": {
+    "nombre": "Baños zona acuática",
+    "tipo": "bano",
+    "descripcion": "Servicios sanitarios."
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-75.381200, 6.138500]
+  }
+}
+```
+
+Tipos soportados: `bano`, `parqueadero`, `primeros_auxilios`, `informacion`.
 
 ---
 
@@ -200,7 +244,7 @@ Requiere `@arcgis/core@4.31.6` (`projection.load()` + `projection.project()`).
 
 ## Próximos pasos
 
-- [ ] Capa `infraestructura.geojson` (baños, parqueaderos)
+- [x] Capa `infraestructura.geojson` (baños, parqueaderos) con pins Esri
 - [ ] Panel React de filtros por `tipo`
 - [ ] Widget Sketch para dibujar y exportar geometrías
 - [ ] `view.goTo(parkLayer.fullExtent)` para encuadrar todo el parque

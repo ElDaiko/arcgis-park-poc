@@ -1,0 +1,64 @@
+/* Vitality & Social Connection — design tokens */
+:root {
+  /* Surfaces */
+  --color-background: #fbf9f8;
+  --color-surface: #ffffff;
+  --color-surface-blue: #f6f8ff;
+  --color-surface-container-low: #f6f3f2;
+  --color-surface-container: #f0eded;
+  --color-surface-container-high: #eae7e7;
+
+  /* Content */
+  --color-on-surface: #1b1c1c;
+  --color-on-surface-variant: #5b3f45;
+  --color-inverse-surface: #303030;
+
+  /* Brand */
+  --color-primary: #db0061;
+  --color-primary-dim: #ae004b;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #fff0f1;
+  --color-primary-fixed: #ffd9df;
+  --color-inverse-primary: #ffb1c0;
+
+  --color-secondary: #008444;
+  --color-secondary-dim: #006d37;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #8ef9ab;
+  --color-on-secondary-container: #00743b;
+
+  --color-tertiary-container: #fce3ed;
+  --color-tertiary-fixed: #f5dce6;
+
+  /* Borders */
+  --color-outline: #8f6f74;
+  --color-outline-variant: #e4bdc3;
+  --color-border-subtle: rgba(48, 48, 48, 0.1);
+
+  /* Feedback */
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  /* Typography */
+  --font-headline: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, sans-serif;
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Spacing (8px base) */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+
+  /* Elevation */
+  --shadow-card: 0 1px 0 var(--color-border-subtle);
+  --shadow-lift: 0 8px 24px rgba(219, 0, 97, 0.1);
+  --shadow-panel: 0 4px 20px rgba(48, 48, 48, 0.08);
+}

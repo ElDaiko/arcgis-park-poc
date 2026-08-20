@@ -14,21 +14,21 @@ export function createTrailsLayer(): GeoJSONLayer {
     renderer: new UniqueValueRenderer({
       field: 'tipo',
       defaultSymbol: new SimpleLineSymbol({
-        color: '#92400e',
+        color: '#008444',
         width: 3,
       }),
       uniqueValueInfos: [
         {
           value: 'sendero_principal',
           symbol: new SimpleLineSymbol({
-            color: '#92400e',
+            color: '#008444',
             width: 4,
           }),
         },
         {
           value: 'acceso_discapacitados',
           symbol: new SimpleLineSymbol({
-            color: '#0369a1',
+            color: '#006d37',
             width: 3,
             style: 'dash',
           }),

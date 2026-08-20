@@ -4,4 +4,6 @@ export interface MapFeature {
   type: string
   description: string
   layerTitle: string
+  /** URL de foto del lugar — campo `imagen` en GeoJSON (local o externa). */
+  imageUrl?: string
 }

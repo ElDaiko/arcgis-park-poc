@@ -7,7 +7,8 @@
         "nombre": "Sendero principal",
         "tipo": "sendero_principal",
         "descripcion": "Acceso peatonal desde la entrada hacia el interior del parque.",
-        "distancia_m": 320
+        "distancia_m": 320,
+        "imagen": "/images/sendero.svg"
       },
       "geometry": {
         "type": "LineString",
@@ -26,7 +27,8 @@
         "nombre": "Acceso universal",
         "tipo": "acceso_discapacitados",
         "descripcion": "Ruta pavimentada de acceso desde la entrada principal.",
-        "distancia_m": 85
+        "distancia_m": 85,
+        "imagen": "/images/sendero.svg"
       },
       "geometry": {
         "type": "LineString",

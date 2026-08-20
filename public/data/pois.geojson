@@ -6,7 +6,8 @@
       "properties": {
         "nombre": "Entrada Tutucán",
         "tipo": "punto_interes",
-        "descripcion": "Acceso principal al parque Comfama por la Calle 38."
+        "descripcion": "Acceso principal al parque Comfama por la Calle 38.",
+        "imagen": "/images/entrada.png"
       },
       "geometry": {
         "type": "Point",

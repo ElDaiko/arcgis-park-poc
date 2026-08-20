@@ -7,7 +7,7 @@ export const POIS_GEOJSON_URL = '/data/pois.geojson'
 
 export function createPoiLayer(): GeoJSONLayer {
   const defaultSymbol = new SimpleMarkerSymbol({
-    color: '#2563eb',
+    color: '#64525a',
     size: 10,
     outline: { color: '#ffffff', width: 2 },
   })
@@ -25,7 +25,7 @@ export function createPoiLayer(): GeoJSONLayer {
         {
           value: 'punto_interes',
           symbol: new SimpleMarkerSymbol({
-            color: '#dc2626',
+            color: '#db0061',
             size: 12,
             outline: { color: '#ffffff', width: 2 },
           }),
@@ -33,7 +33,7 @@ export function createPoiLayer(): GeoJSONLayer {
         {
           value: 'atraccion',
           symbol: new SimpleMarkerSymbol({
-            color: '#2563eb',
+            color: '#008444',
             size: 11,
             outline: { color: '#ffffff', width: 2 },
           }),
@@ -41,7 +41,7 @@ export function createPoiLayer(): GeoJSONLayer {
         {
           value: 'servicio',
           symbol: new SimpleMarkerSymbol({
-            color: '#ca8a04',
+            color: '#ae004b',
             size: 10,
             outline: { color: '#ffffff', width: 2 },
           }),

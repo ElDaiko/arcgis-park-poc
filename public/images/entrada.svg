@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7ec8e3"/>
+      <stop offset="100%" stop-color="#b8e6f0"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <rect y="220" width="640" height="140" fill="#4ade80"/>
+  <rect x="80" y="140" width="480" height="90" rx="8" fill="#166534" opacity="0.85"/>
+  <text x="320" y="195" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif" font-size="28" font-weight="700">Entrada Tutucán</text>
+  <text x="320" y="330" text-anchor="middle" fill="#14532d" font-family="system-ui,sans-serif" font-size="18">Acceso principal · Calle 38</text>
+</svg>

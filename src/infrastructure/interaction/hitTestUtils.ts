@@ -3,7 +3,12 @@ import type GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
 import type Layer from '@arcgis/core/layers/Layer'
 
 /** Prioridad al clic: la capa más específica gana (punto > línea > polígono). */
-const LAYER_HIT_PRIORITY = ['pois', 'senderos', 'parque'] as const
+const LAYER_HIT_PRIORITY = [
+  'pois',
+  'infraestructura',
+  'senderos',
+  'parque',
+] as const
 
 export function pickBestGraphicHit(
   results: __esri.MapViewViewHit[],

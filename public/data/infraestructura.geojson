@@ -1,0 +1,57 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Baños — Entrada Calle 38",
+        "tipo": "bano",
+        "descripcion": "Servicios sanitarios junto al acceso principal del parque.",
+        "imagen": "/images/bano.svg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.382180, 6.139700]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Parqueadero Calle 38",
+        "tipo": "parqueadero",
+        "descripcion": "Estacionamiento de visitantes frente a la entrada principal.",
+        "imagen": "/images/parqueadero.svg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.382320, 6.139780]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Primeros auxilios",
+        "tipo": "primeros_auxilios",
+        "descripcion": "Puesto de atención primaria y botiquín en zona de acceso.",
+        "imagen": "/images/primeros-auxilios.svg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.382150, 6.139580]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "Punto de información",
+        "tipo": "informacion",
+        "descripcion": "Orientación, mapas del parque y venta de boletas.",
+        "imagen": "/images/informacion.svg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.382290, 6.139620]
+      }
+    }
+  ]
+}

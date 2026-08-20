@@ -6,7 +6,8 @@
       "properties": {
         "nombre": "Parque Recreativo Comfama",
         "tipo": "zona_principal",
-        "descripcion": "Área general del parque que comprende las atracciones principales y el Mundo Acuático."
+        "descripcion": "Área general del parque que comprende las atracciones principales y el Mundo Acuático.",
+        "imagen": "/images/parque.png"
       },
       "geometry": {
         "type": "Polygon",

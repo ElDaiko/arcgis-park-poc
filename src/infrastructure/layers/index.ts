@@ -1,5 +1,6 @@
 import type Layer from '@arcgis/core/layers/Layer'
 import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
+import { createInfrastructureLayer } from './infrastructureLayer'
 import { createParkBoundaryLayer } from './parkLayer'
 import { createPoiLayer } from './poiLayer'
 import { createTrailsLayer } from './trailsLayer'
@@ -16,7 +17,12 @@ export function createOperationalLayers(): OperationalLayers {
   const poiLayer = createPoiLayer()
 
   return {
-    layers: [createParkBoundaryLayer(), createTrailsLayer(), poiLayer],
+    layers: [
+      createParkBoundaryLayer(),
+      createTrailsLayer(),
+      createInfrastructureLayer(),
+      poiLayer,
+    ],
     poiLayer,
   }
 }

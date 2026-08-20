@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#dcfce7"/>
+  <ellipse cx="320" cy="280" rx="260" ry="60" fill="#86efac" opacity="0.5"/>
+  <path d="M120 260 Q200 120 320 150 T520 260 Z" fill="#22c55e" opacity="0.7"/>
+  <circle cx="480" cy="100" r="45" fill="#fde047" opacity="0.9"/>
+  <text x="320" y="200" text-anchor="middle" fill="#14532d" font-family="system-ui,sans-serif" font-size="26" font-weight="700">Parque Comfama Tutucán</text>
+  <text x="320" y="235" text-anchor="middle" fill="#166534" font-family="system-ui,sans-serif" font-size="16">Atracciones · Mundo Acuático</text>
+</svg>

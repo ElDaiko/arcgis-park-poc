@@ -13,9 +13,9 @@ export function createParkBoundaryLayer(): GeoJSONLayer {
     popupEnabled: false,
     renderer: new SimpleRenderer({
       symbol: new SimpleFillSymbol({
-        color: [34, 197, 94, 0.22],
+        color: [219, 0, 97, 0.22],
         outline: {
-          color: '#15803d',
+          color: '#db0061',
           width: 2,
         },
       }),

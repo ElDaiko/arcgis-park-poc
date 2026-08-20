@@ -9,6 +9,10 @@ const TYPE_LABELS: Record<string, string> = {
   zona_principal: 'Zona principal',
   sendero_principal: 'Sendero principal',
   acceso_discapacitados: 'Acceso universal',
+  bano: 'Baños',
+  parqueadero: 'Parqueadero',
+  primeros_auxilios: 'Primeros auxilios',
+  informacion: 'Información',
 }
 
 function readAttribute(
@@ -41,5 +45,6 @@ export function toMapFeature(graphic: Graphic, layer: Layer): MapFeature {
     type: type || 'desconocido',
     description: readAttribute(attributes, 'descripcion'),
     layerTitle: layer.title ?? 'Capa',
+    imageUrl: readAttribute(attributes, 'imagen') || undefined,
   }
 }
