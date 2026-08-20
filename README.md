@@ -8,13 +8,14 @@ Construido con **Vite**, **React**, **TypeScript** y **ArcGIS Maps SDK for JavaS
 
 ## Características
 
-- Mapa base topográfico centrado en la entrada del parque (zoom 17).
+- Mapa base topográfico centrado en la entrada del parque (zoom 16).
+- **Basemap + vista 2D/3D:** selector ligero (topo / satélite / híbrido / calles) y toggle MapView ↔ SceneView.
 - **4 capas GeoJSON** independientes (una geometría por archivo):
   - `parque.geojson` — polígono del parque
   - `senderos.geojson` — rutas peatonales (Polyline)
   - `infraestructura.geojson` — baños, parqueaderos, etc. (Point + pins Esri)
   - `pois.geojson` — puntos de interés (Point)
-- **Interactividad (Nivel 1):** clic en features → highlight + panel React con detalle (un solo panel, sin popup duplicado de ArcGIS).
+- **Interactividad (Nivel 1):** clic en features → highlight + panel React + zoom suave.
 - **LayerList (Nivel 2):** widget nativo para encender/apagar capas (esquina superior izquierda).
 - **Conversor de coordenadas:** WGS84 (EPSG:4326) y MAGNA-SIRGAS Origen Nacional (EPSG:9377) en cada clic.
 - **Clean Architecture:** React no importa `@arcgis/core`.
@@ -81,7 +82,7 @@ natural-park-gis-poc/
 │   │   ├── mappers/
 │   │   │   └── mapFeatureMapper.ts  # Graphic → MapFeature
 │   │   └── widgets/
-│   │       └── mapWidgets.ts        # LayerList, highlight, popup
+│   │       └── mapWidgets.ts        # LayerList, highlight, legend
 │   └── presentation/
 │       ├── MapComponent.tsx
 │       ├── CoordinatePanel.tsx
@@ -249,8 +250,6 @@ Requiere `@arcgis/core@4.31.6` (`projection.load()` + `projection.project()`).
 - [x] Capa `infraestructura.geojson` (baños, parqueaderos) con pins Esri
 - [x] Panel React de filtros por categoría (`CategoryFilterPanel`)
 - [ ] Widget Sketch para dibujar y exportar geometrías
-- [ ] `view.goTo(parkLayer.fullExtent)` para encuadrar todo el parque
-- [ ] SceneView 3D (solo si hay caso de uso claro)
 - [ ] Heatmap de densidad de visitantes
 
 ---

@@ -20,6 +20,7 @@ export function createPoiLayer(): GeoJSONLayer {
     listMode: 'show',
     popupEnabled: false,
     outFields: ['*'],
+    elevationInfo: { mode: 'relative-to-ground', offset: 2 },
     renderer: new UniqueValueRenderer({
       field: 'categoria',
       defaultSymbol: createEsriPinSymbol('blue', 24),

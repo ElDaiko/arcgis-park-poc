@@ -11,6 +11,8 @@ export function createInfrastructureLayer(): GeoJSONLayer {
     title: 'Infraestructura',
     listMode: 'show',
     popupEnabled: false,
+    outFields: ['*'],
+    elevationInfo: { mode: 'relative-to-ground', offset: 2 },
     renderer: new UniqueValueRenderer({
       field: 'tipo',
       defaultSymbol: createEsriPinSymbol('blue', 24),

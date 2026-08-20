@@ -2,12 +2,18 @@ import { useEffect, useRef, useState } from 'react'
 import type { Coordinate } from '../domain/Coordinate'
 import type { MapFeature } from '../domain/MapFeature'
 import type { IMapService } from '../domain/IMapService'
+import type { BasemapId, ViewMode } from '../domain/MapControls'
+import {
+  DEFAULT_BASEMAP,
+  DEFAULT_VIEW_MODE,
+} from '../domain/MapControls'
 import type { PoiCategory } from '../domain/PoiCategory'
 import { POI_CATEGORIES } from '../domain/PoiCategory'
 import { ArcGISMapController } from '../infrastructure/ArcGISMapController'
 import { CategoryFilterPanel } from './CategoryFilterPanel'
 import { CoordinatePanel } from './CoordinatePanel'
 import { FeatureDetailPanel } from './FeatureDetailPanel'
+import { MapControlsPanel } from './MapControlsPanel'
 
 export function MapComponent() {
   const mapContainerRef = useRef<HTMLDivElement>(null)
@@ -17,6 +23,8 @@ export function MapComponent() {
   const [activeCategories, setActiveCategories] = useState<PoiCategory[]>([
     ...POI_CATEGORIES,
   ])
+  const [basemapId, setBasemapId] = useState<BasemapId>(DEFAULT_BASEMAP)
+  const [viewMode, setViewMode] = useState<ViewMode>(DEFAULT_VIEW_MODE)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -78,6 +86,18 @@ export function MapComponent() {
       <CategoryFilterPanel
         selected={activeCategories}
         onChange={handleCategoryChange}
+      />
+      <MapControlsPanel
+        basemapId={basemapId}
+        viewMode={viewMode}
+        onBasemapChange={(id) => {
+          setBasemapId(id)
+          mapServiceRef.current?.setBasemap(id)
+        }}
+        onViewModeChange={(mode) => {
+          setViewMode(mode)
+          void mapServiceRef.current?.setViewMode(mode)
+        }}
       />
       <CoordinatePanel coordinate={coordinate} />
       {selectedFeature && (

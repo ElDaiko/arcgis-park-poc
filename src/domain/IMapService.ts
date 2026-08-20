@@ -1,4 +1,5 @@
 import type { Coordinate } from './Coordinate'
+import type { BasemapId, ViewMode } from './MapControls'
 import type { MapFeature } from './MapFeature'
 import type { PoiCategory } from './PoiCategory'
 
@@ -12,9 +13,9 @@ export interface MapCallbacks {
 
 export interface IMapService {
   initialize(container: HTMLDivElement, callbacks: MapCallbacks): Promise<void>
-  /** Filtra POIs por categorías visibles. Array vacío = ocultar todos. */
   setPoiCategoryFilter(categories: readonly PoiCategory[]): void
-  /** Quita highlight y cierra la selección en el mapa. */
+  setBasemap(basemapId: BasemapId): void
+  setViewMode(mode: ViewMode): Promise<void>
   clearSelection(): void
   destroy(): void
 }
