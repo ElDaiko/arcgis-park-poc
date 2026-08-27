@@ -1,3 +1,4 @@
+import { useEffect, useId, useRef, useState } from 'react'
 import {
   BASEMAP_OPTIONS,
   type BasemapId,
@@ -17,25 +18,92 @@ export function MapControlsPanel({
   onBasemapChange,
   onViewModeChange,
 }: MapControlsPanelProps) {
-  return (
-    <aside className="map-controls" aria-label="Controles del mapa">
-      <label className="map-controls__field">
-        <span>Mapa</span>
-        <select
-          value={basemapId}
-          onChange={(event) =>
-            onBasemapChange(event.target.value as BasemapId)
-          }
-        >
-          {BASEMAP_OPTIONS.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
+  const [galleryOpen, setGalleryOpen] = useState(false)
+  const rootRef = useRef<HTMLElement>(null)
+  const labelId = useId()
+  const activeBasemap =
+    BASEMAP_OPTIONS.find((option) => option.id === basemapId) ??
+    BASEMAP_OPTIONS[0]
 
-      <div className="map-controls__toggle" role="group" aria-label="Vista">
+  useEffect(() => {
+    if (!galleryOpen) {
+      return
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        rootRef.current &&
+        event.target instanceof Node &&
+        !rootRef.current.contains(event.target)
+      ) {
+        setGalleryOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
+  }, [galleryOpen])
+
+  return (
+    <aside
+      ref={rootRef}
+      className="map-controls"
+      aria-label="Controles del mapa"
+    >
+      <div className="map-controls__basemap">
+        <button
+          type="button"
+          className={
+            galleryOpen
+              ? 'map-controls__basemap-toggle is-open'
+              : 'map-controls__basemap-toggle'
+          }
+          aria-expanded={galleryOpen}
+          aria-controls={labelId}
+          title="Tipos de mapa base"
+          onClick={() => setGalleryOpen((open) => !open)}
+        >
+          <img
+            src={activeBasemap.thumbnailUrl}
+            alt=""
+            width={40}
+            height={40}
+          />
+          <span>Mapas</span>
+        </button>
+
+        {galleryOpen && (
+          <div
+            id={labelId}
+            className="map-controls__basemap-gallery"
+            role="listbox"
+            aria-label="Mapa base"
+          >
+            {BASEMAP_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                role="option"
+                aria-selected={option.id === basemapId}
+                className={
+                  option.id === basemapId
+                    ? 'map-controls__basemap-item is-active'
+                    : 'map-controls__basemap-item'
+                }
+                onClick={() => {
+                  onBasemapChange(option.id)
+                  setGalleryOpen(false)
+                }}
+              >
+                <img src={option.thumbnailUrl} alt="" width={72} height={72} />
+                <span>{option.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="map-controls__toggle" role="group" aria-label="Vista 2D o 3D">
         <button
           type="button"
           className={viewMode === '2d' ? 'is-active' : undefined}

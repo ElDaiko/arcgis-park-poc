@@ -9,7 +9,7 @@ Construido con **Vite**, **React**, **TypeScript** y **ArcGIS Maps SDK for JavaS
 ## Características
 
 - Mapa base topográfico centrado en la entrada del parque (zoom 16).
-- **Basemap + vista 2D/3D:** selector ligero (topo / satélite / híbrido / calles) y toggle MapView ↔ SceneView.
+- **Basemap + vista 2D/3D:** `BasemapGallery` de Esri (miniaturas) y toggle MapView ↔ SceneView.
 - **4 capas GeoJSON** independientes (una geometría por archivo):
   - `parque.geojson` — polígono del parque
   - `senderos.geojson` — rutas peatonales (Polyline)

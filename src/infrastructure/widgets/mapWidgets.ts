@@ -2,12 +2,13 @@ import type Graphic from '@arcgis/core/Graphic'
 import type GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
 import type MapView from '@arcgis/core/views/MapView'
 import type SceneView from '@arcgis/core/views/SceneView'
+import Expand from '@arcgis/core/widgets/Expand'
 import LayerList from '@arcgis/core/widgets/LayerList'
 import Legend from '@arcgis/core/widgets/Legend'
-import Expand from '@arcgis/core/widgets/Expand'
 
 export type ActiveView = MapView | SceneView
 
+/** LayerList siempre visible (debajo del filtro de categorías). */
 export function setupLayerList(view: ActiveView): LayerList {
   const layerList = new LayerList({ view })
   view.ui.add(layerList, 'top-left')

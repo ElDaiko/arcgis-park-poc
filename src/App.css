@@ -150,56 +150,105 @@
   z-index: 3;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
+  gap: 8px;
+  padding: 6px;
   box-sizing: border-box;
   font-family: var(--font-body);
-  color: var(--color-on-surface);
   background: var(--color-surface);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-panel);
 }
 
-.map-controls__field {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-primary);
+.map-controls__basemap {
+  position: relative;
 }
 
-.map-controls__field select {
-  height: 32px;
-  min-width: 132px;
-  padding: 0 8px;
+.map-controls__basemap-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 10px 0 4px;
   border: 1px solid var(--color-outline-variant);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-on-surface);
   font-family: var(--font-body);
   font-size: 0.8125rem;
-  font-weight: 500;
-  text-transform: none;
-  letter-spacing: normal;
+  font-weight: 600;
   cursor: pointer;
+}
+
+.map-controls__basemap-toggle img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.map-controls__basemap-toggle.is-open,
+.map-controls__basemap-toggle:hover {
+  border-color: var(--color-primary);
+}
+
+.map-controls__basemap-gallery {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 240px;
+  padding: 10px;
+  box-sizing: border-box;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
+}
+
+.map-controls__basemap-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.map-controls__basemap-item img {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.map-controls__basemap-item:hover,
+.map-controls__basemap-item.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-container);
 }
 
 .map-controls__toggle {
   display: inline-flex;
-  align-self: flex-end;
   border: 1px solid var(--color-outline-variant);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
 
 .map-controls__toggle button {
-  height: 32px;
-  min-width: 42px;
-  padding: 0 12px;
+  height: 40px;
+  min-width: 48px;
+  padding: 0 14px;
   border: none;
   background: transparent;
   color: var(--color-primary-dim);
@@ -502,7 +551,7 @@
 }
 
 /* ─── ArcGIS LayerList & widgets ─── */
-/* LayerList debajo del filtro de categorías */
+/* LayerList expandido debajo del filtro de categorías */
 .map-shell .esri-ui-top-left {
   top: 320px;
   left: var(--space-2);
@@ -603,9 +652,8 @@
   }
 
   .map-controls {
-    left: var(--space-2);
-    right: var(--space-2);
-    transform: none;
-    justify-content: space-between;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
   }
 }
