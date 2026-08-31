@@ -11,6 +11,9 @@ export function createParkBoundaryLayer(): GeoJSONLayer {
     title: 'Parque Recreativo Comfama',
     listMode: 'show',
     popupEnabled: false,
+    elevationInfo: {
+      mode: 'on-the-ground',
+    },
     renderer: new SimpleRenderer({
       symbol: new SimpleFillSymbol({
         color: [219, 0, 97, 0.22],

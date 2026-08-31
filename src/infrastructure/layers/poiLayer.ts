@@ -3,7 +3,11 @@ import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
 import Point from '@arcgis/core/geometry/Point'
 import PopupTemplate from '@arcgis/core/PopupTemplate'
 import UniqueValueRenderer from '@arcgis/core/renderers/UniqueValueRenderer'
+import IconSymbol3DLayer from '@arcgis/core/symbols/IconSymbol3DLayer'
+import LabelSymbol3D from '@arcgis/core/symbols/LabelSymbol3D'
+import PointSymbol3D from '@arcgis/core/symbols/PointSymbol3D'
 import TextSymbol from '@arcgis/core/symbols/TextSymbol'
+import TextSymbol3DLayer from '@arcgis/core/symbols/TextSymbol3DLayer'
 import { createEsriPinSymbol } from './symbols/esriPins'
 
 export const POIS_GEOJSON_URL = '/data/pois.geojson'
@@ -21,37 +25,7 @@ export function createPoiLayer(): GeoJSONLayer {
     popupEnabled: false,
     outFields: ['*'],
     elevationInfo: { mode: 'relative-to-ground', offset: 2 },
-    renderer: new UniqueValueRenderer({
-      field: 'categoria',
-      defaultSymbol: createEsriPinSymbol('blue', 24),
-      uniqueValueInfos: [
-        {
-          value: 'atraccion',
-          label: 'Atracción',
-          symbol: createEsriPinSymbol('red', 28),
-        },
-        {
-          value: 'gastronomia',
-          label: 'Gastronomía',
-          symbol: createEsriPinSymbol('orange', 26),
-        },
-        {
-          value: 'acuatico',
-          label: 'Acuático',
-          symbol: createEsriPinSymbol('blue', 26),
-        },
-        {
-          value: 'deporte',
-          label: 'Deporte',
-          symbol: createEsriPinSymbol('green', 26),
-        },
-        {
-          value: 'servicio',
-          label: 'Servicio',
-          symbol: createEsriPinSymbol('yellow', 26),
-        },
-      ],
-    }),
+    renderer: createPoi2dRenderer(),
     popupTemplate: new PopupTemplate({
       title: '{nombre}',
       content: `
@@ -85,6 +59,140 @@ export function createPoiLayer(): GeoJSONLayer {
       }),
     ],
   })
+}
+
+function createPoi2dRenderer(): UniqueValueRenderer {
+  return new UniqueValueRenderer({
+    field: 'categoria',
+    defaultSymbol: createEsriPinSymbol('blue', 24),
+    uniqueValueInfos: [
+      {
+        value: 'atraccion',
+        label: 'Atracción',
+        symbol: createEsriPinSymbol('red', 28),
+      },
+      {
+        value: 'gastronomia',
+        label: 'Gastronomía',
+        symbol: createEsriPinSymbol('orange', 26),
+      },
+      {
+        value: 'acuatico',
+        label: 'Acuático',
+        symbol: createEsriPinSymbol('blue', 26),
+      },
+      {
+        value: 'deporte',
+        label: 'Deporte',
+        symbol: createEsriPinSymbol('green', 26),
+      },
+      {
+        value: 'servicio',
+        label: 'Servicio',
+        symbol: createEsriPinSymbol('yellow', 26),
+      },
+    ],
+  })
+}
+
+function createPoi3dRenderer(): UniqueValueRenderer {
+  return new UniqueValueRenderer({
+    field: 'categoria',
+    defaultSymbol: createPoi3dSymbol('#2878d0'),
+    uniqueValueInfos: [
+      {
+        value: 'atraccion',
+        label: 'Atracción',
+        symbol: createPoi3dSymbol('#e53935'),
+      },
+      {
+        value: 'gastronomia',
+        label: 'Gastronomía',
+        symbol: createPoi3dSymbol('#f28c28'),
+      },
+      {
+        value: 'acuatico',
+        label: 'Acuático',
+        symbol: createPoi3dSymbol('#2878d0'),
+      },
+      {
+        value: 'deporte',
+        label: 'Deporte',
+        symbol: createPoi3dSymbol('#16a05d'),
+      },
+      {
+        value: 'servicio',
+        label: 'Servicio',
+        symbol: createPoi3dSymbol('#e6b800'),
+      },
+    ],
+  })
+}
+
+function createPoi3dSymbol(color: string): PointSymbol3D {
+  return new PointSymbol3D({
+    symbolLayers: [
+      new IconSymbol3DLayer({
+        size: 24,
+        material: { color },
+        outline: { color: '#ffffff', size: 1.5 },
+        resource: { primitive: 'circle' },
+      }),
+    ],
+  })
+}
+
+function createPoi2dLabelClass(): LabelClass {
+  return new LabelClass({
+    labelExpressionInfo: {
+      expression: '$feature.nombre',
+    },
+    symbol: new TextSymbol({
+      color: '#1b1c1c',
+      haloColor: '#ffffff',
+      haloSize: 1.5,
+      font: {
+        family: 'Source Sans 3',
+        size: 10,
+        weight: 'bold',
+      },
+    }),
+    labelPlacement: 'above-center',
+    minScale: 8000,
+  })
+}
+
+function createPoi3dLabelClass(): LabelClass {
+  return new LabelClass({
+    labelExpressionInfo: {
+      expression: '$feature.nombre',
+    },
+    symbol: new LabelSymbol3D({
+      symbolLayers: [
+        new TextSymbol3DLayer({
+          material: { color: '#1b1c1c' },
+          size: 16,
+          halo: { color: '#ffffff', size: 2 },
+          font: {
+            family: 'Source Sans 3',
+            weight: 'bold',
+          },
+        }),
+      ],
+    }),
+    labelPlacement: 'above-center',
+  })
+}
+
+export function setPoiViewMode(
+  poiLayer: GeoJSONLayer,
+  viewMode: '2d' | '3d',
+): void {
+  poiLayer.renderer =
+    viewMode === '3d' ? createPoi3dRenderer() : createPoi2dRenderer()
+  poiLayer.labelingInfo = [
+    viewMode === '3d' ? createPoi3dLabelClass() : createPoi2dLabelClass(),
+  ]
 }
 
 export async function getEntranceCoordinates(

@@ -17,6 +17,7 @@ import type { PoiCategory } from '../domain/PoiCategory'
 import {
   createOperationalLayers,
   getEntranceCoordinates,
+  setPoiViewMode,
 } from './layers'
 import { buildPoiCategoryExpression } from './filters/poiCategoryFilter'
 import { toMapFeature } from './mappers/mapFeatureMapper'
@@ -39,8 +40,6 @@ const FEATURE_ZOOM = 17
 export class ArcGISMapController implements IMapService {
   private readonly apiKey: string
   private map: Map | null = null
-  private mapView: MapView | null = null
-  private sceneView: SceneView | null = null
   private view: ActiveView | null = null
   private container: HTMLDivElement | null = null
   private callbacks: MapCallbacks | null = null
@@ -94,7 +93,7 @@ export class ArcGISMapController implements IMapService {
       layers: this.interactiveLayers,
     })
 
-    this.mapView = new MapView({
+    this.view = new MapView({
       container,
       map: this.map,
       center,
@@ -102,17 +101,7 @@ export class ArcGISMapController implements IMapService {
       popupEnabled: false,
     })
 
-    this.sceneView = new SceneView({
-      container: null,
-      map: this.map,
-      center,
-      zoom: 16,
-      popupEnabled: false,
-      qualityProfile: 'low',
-    })
-
-    this.view = this.mapView
-    await this.mapView.when()
+    await this.view.when()
 
     if (this.destroyed || !this.view) {
       return
@@ -152,38 +141,66 @@ export class ArcGISMapController implements IMapService {
   async setViewMode(mode: ViewMode): Promise<void> {
     if (
       mode === this.viewMode ||
-      !this.mapView ||
-      !this.sceneView ||
+      !this.map ||
       !this.container ||
       !this.view
     ) {
       return
     }
 
-    const next = mode === '3d' ? this.sceneView : this.mapView
-    const viewpoint = this.view.viewpoint?.clone()
+    const current = this.view
+    const center = current.center
+    const zoom = current.zoom
+    const map = this.map
 
     this.unbindUi()
 
-    this.view.container = null
-    next.container = this.container
-    if (viewpoint) {
-      next.viewpoint = viewpoint
+    // View.destroy() también destruye su Map si sigue asignado.
+    // Separamos el Map para conservar todas las capas GeoJSON.
+    current.map = null as unknown as Map
+    current.destroy()
+
+    if (this.poiLayer) {
+      setPoiViewMode(this.poiLayer, mode)
     }
 
-    this.view = next
     this.viewMode = mode
+    this.view = mode === '3d'
+      ? new SceneView({
+          container: this.container,
+          map,
+          center: [center.longitude, center.latitude],
+          zoom,
+          popupEnabled: false,
+        })
+      : new MapView({
+          container: this.container,
+          map,
+          center: [center.longitude, center.latitude],
+          zoom,
+          popupEnabled: false,
+        })
 
-    await next.when()
+    await this.view.when()
     if (this.destroyed || !this.view || !this.poiLayer) {
       return
     }
+
+    await Promise.all(this.interactiveLayers.map((layer) => layer.when()))
 
     this.bindUi()
     this.bindClick()
 
     if (mode === '3d') {
-      void this.view.goTo({ tilt: 55 }, { duration: 700 })
+      void this.view.goTo(
+        {
+          center: [center.longitude, center.latitude],
+          zoom,
+          tilt: 55,
+          heading: 0,
+        },
+        { duration: 700 },
+      )
     }
   }
 
@@ -199,19 +216,12 @@ export class ArcGISMapController implements IMapService {
     this.destroyed = true
     this.unbindUi()
 
-    if (this.mapView) {
-      this.mapView.map = null
-      this.mapView.destroy()
-      this.mapView = null
+    if (this.view) {
+      this.view.map = null as unknown as Map
+      this.view.destroy()
+      this.view = null
     }
 
-    if (this.sceneView) {
-      this.sceneView.map = null
-      this.sceneView.destroy()
-      this.sceneView = null
-    }
-
-    this.view = null
     this.map?.destroy()
     this.map = null
     this.container = null

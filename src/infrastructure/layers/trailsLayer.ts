@@ -11,6 +11,9 @@ export function createTrailsLayer(): GeoJSONLayer {
     title: 'Senderos',
     listMode: 'show',
     popupEnabled: false,
+    elevationInfo: {
+      mode: 'on-the-ground',
+    },
     renderer: new UniqueValueRenderer({
       field: 'tipo',
       defaultSymbol: new SimpleLineSymbol({

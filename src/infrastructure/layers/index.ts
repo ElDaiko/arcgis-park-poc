@@ -5,7 +5,7 @@ import { createParkBoundaryLayer } from './parkLayer'
 import { createPoiLayer } from './poiLayer'
 import { createTrailsLayer } from './trailsLayer'
 
-export { getEntranceCoordinates } from './poiLayer'
+export { getEntranceCoordinates, setPoiViewMode } from './poiLayer'
 
 export interface OperationalLayers {
   layers: Layer[]

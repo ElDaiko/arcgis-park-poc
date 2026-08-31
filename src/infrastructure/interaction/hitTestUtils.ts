@@ -10,12 +10,19 @@ const LAYER_HIT_PRIORITY = [
   'parque',
 ] as const
 
+interface GraphicHitCandidate {
+  type: 'graphic'
+  graphic: Graphic
+  layer: Layer
+  distance?: number
+}
+
 export function pickBestGraphicHit(
-  results: __esri.ViewHit[],
-): __esri.GraphicHit | undefined {
+  results: readonly (__esri.ViewHit | __esri.MapViewViewHit)[],
+): GraphicHitCandidate | undefined {
   const graphicHits = results.filter(
-    (result): result is __esri.GraphicHit => result.type === 'graphic',
-  )
+    (result) => result.type === 'graphic',
+  ) as unknown as GraphicHitCandidate[]
 
   for (const layerId of LAYER_HIT_PRIORITY) {
     const layerHits = graphicHits.filter(
