@@ -44,6 +44,7 @@ export class ArcGISMapController implements IMapService {
   private container: HTMLDivElement | null = null
   private callbacks: MapCallbacks | null = null
   private poiLayer: GeoJSONLayer | null = null
+  private temporary3dLayer: Layer | null = null
   private clickHandle: IHandle | null = null
   private highlightHandle: IHandle | null = null
   private layerList: LayerList | null = null
@@ -73,9 +74,10 @@ export class ArcGISMapController implements IMapService {
       return
     }
 
-    const { layers, poiLayer } = createOperationalLayers()
+    const { layers, poiLayer, temporary3dLayer } = createOperationalLayers()
     this.interactiveLayers = layers
     this.poiLayer = poiLayer
+    this.temporary3dLayer = temporary3dLayer
     this.container = container
     this.callbacks = callbacks
 
@@ -90,7 +92,7 @@ export class ArcGISMapController implements IMapService {
     this.map = new Map({
       basemap: 'topo-vector',
       ground: 'world-elevation',
-      layers: this.interactiveLayers,
+      layers: [...this.interactiveLayers, temporary3dLayer],
     })
 
     this.view = new MapView({
@@ -163,6 +165,9 @@ export class ArcGISMapController implements IMapService {
     if (this.poiLayer) {
       setPoiViewMode(this.poiLayer, mode)
     }
+    if (this.temporary3dLayer) {
+      this.temporary3dLayer.visible = mode === '3d'
+    }
 
     this.viewMode = mode
     this.view = mode === '3d'
@@ -227,6 +232,7 @@ export class ArcGISMapController implements IMapService {
     this.container = null
     this.callbacks = null
     this.poiLayer = null
+    this.temporary3dLayer = null
     this.interactiveLayers = []
   }
 
