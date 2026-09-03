@@ -1,0 +1,290 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3800, 6.1358], [-75.3792, 6.1358], [-75.3792, 6.1366], [-75.3800, 6.1366], [-75.3800, 6.1358]]]
+      },
+      "properties": { "id": "C01", "nombre": "Salón de Eventos / Depósito Sur", "zona": "sur", "aforo_actual": 147, "indice_densidad": 0.52, "nivel_uso": 3, "capacidad_maxima": 400 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3792, 6.1358], [-75.3784, 6.1358], [-75.3784, 6.1366], [-75.3792, 6.1366], [-75.3792, 6.1358]]]
+      },
+      "properties": { "id": "C02", "nombre": "Food Court / Zona de Yoga", "zona": "sur", "aforo_actual": 230, "indice_densidad": 0.84, "nivel_uso": 5, "capacidad_maxima": 310 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3784, 6.1358], [-75.3776, 6.1358], [-75.3776, 6.1366], [-75.3784, 6.1366], [-75.3784, 6.1358]]]
+      },
+      "properties": { "id": "C03", "nombre": "Zona de Pesca / Lago Artificial", "zona": "acuatica", "aforo_actual": 95, "indice_densidad": 0.49, "nivel_uso": 3, "capacidad_maxima": 210 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3776, 6.1358], [-75.3768, 6.1358], [-75.3768, 6.1366], [-75.3776, 6.1366], [-75.3776, 6.1358]]]
+      },
+      "properties": { "id": "C04", "nombre": "Muelle / Kayaks", "zona": "acuatica", "aforo_actual": 66, "indice_densidad": 0.55, "nivel_uso": 3, "capacidad_maxima": 120 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3768, 6.1358], [-75.3760, 6.1358], [-75.3760, 6.1366], [-75.3768, 6.1366], [-75.3768, 6.1358]]]
+      },
+      "properties": { "id": "C05", "nombre": "Zona de Yoga Sur", "zona": "recreativa", "aforo_actual": 20, "indice_densidad": 0.33, "nivel_uso": 2, "capacidad_maxima": 60 }
+    },
+
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3800, 6.1366], [-75.3792, 6.1366], [-75.3792, 6.1374], [-75.3800, 6.1374], [-75.3800, 6.1366]]]
+      },
+      "properties": { "id": "C06", "nombre": "Cafetería Zona Sur", "zona": "sur", "aforo_actual": 88, "indice_densidad": 0.73, "nivel_uso": 4, "capacidad_maxima": 120 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3792, 6.1366], [-75.3784, 6.1366], [-75.3784, 6.1374], [-75.3792, 6.1374], [-75.3792, 6.1366]]]
+      },
+      "properties": { "id": "C07", "nombre": "Restaurante Principal", "zona": "sur", "aforo_actual": 145, "indice_densidad": 0.91, "nivel_uso": 5, "capacidad_maxima": 160 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3784, 6.1366], [-75.3776, 6.1366], [-75.3776, 6.1374], [-75.3784, 6.1374], [-75.3784, 6.1366]]]
+      },
+      "properties": { "id": "C08", "nombre": "Baños Públicos Sur", "zona": "sur", "aforo_actual": 35, "indice_densidad": 0.70, "nivel_uso": 4, "capacidad_maxima": 50 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3776, 6.1366], [-75.3768, 6.1366], [-75.3768, 6.1374], [-75.3776, 6.1374], [-75.3776, 6.1366]]]
+      },
+      "properties": { "id": "C09", "nombre": "Estacionamiento Sur", "zona": "sur", "aforo_actual": 180, "indice_densidad": 0.60, "nivel_uso": 3, "capacidad_maxima": 300 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3768, 6.1366], [-75.3760, 6.1366], [-75.3760, 6.1374], [-75.3768, 6.1374], [-75.3768, 6.1366]]]
+      },
+      "properties": { "id": "C10", "nombre": "Pista de Atletismo", "zona": "recreativa", "aforo_actual": 55, "indice_densidad": 0.55, "nivel_uso": 3, "capacidad_maxima": 100 }
+    },
+
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3800, 6.1374], [-75.3792, 6.1374], [-75.3792, 6.1382], [-75.3800, 6.1382], [-75.3800, 6.1374]]]
+      },
+      "properties": { "id": "C11", "nombre": "Parqueadero Zona A", "zona": "acceso", "aforo_actual": 95, "indice_densidad": 0.32, "nivel_uso": 2, "capacidad_maxima": 300 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3792, 6.1374], [-75.3784, 6.1374], [-75.3784, 6.1382], [-75.3792, 6.1382], [-75.3792, 6.1374]]]
+      },
+      "properties": { "id": "C12", "nombre": "Kiosco Central / Punto Información", "zona": "acceso", "aforo_actual": 110, "indice_densidad": 0.63, "nivel_uso": 4, "capacidad_maxima": 170 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3784, 6.1374], [-75.3776, 6.1374], [-75.3776, 6.1382], [-75.3784, 6.1382], [-75.3784, 6.1374]]]
+      },
+      "properties": { "id": "C13", "nombre": "Tienda de Souvenirs", "zona": "sur", "aforo_actual": 42, "indice_densidad": 0.58, "nivel_uso": 3, "capacidad_maxima": 72 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3776, 6.1374], [-75.3768, 6.1374], [-75.3768, 6.1382], [-75.3776, 6.1382], [-75.3776, 6.1374]]]
+      },
+      "properties": { "id": "C14", "nombre": "Zona de Descanso Sur", "zona": "sur", "aforo_actual": 67, "indice_densidad": 0.44, "nivel_uso": 3, "capacidad_maxima": 150 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3768, 6.1374], [-75.3760, 6.1374], [-75.3760, 6.1382], [-75.3768, 6.1382], [-75.3768, 6.1374]]]
+      },
+      "properties": { "id": "C15", "nombre": "Cancha de Fútbol 2 / Gimnasio", "zona": "recreativa", "aforo_actual": 50, "indice_densidad": 0.42, "nivel_uso": 2, "capacidad_maxima": 120 }
+    },
+
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3800, 6.1382], [-75.3792, 6.1382], [-75.3792, 6.1390], [-75.3800, 6.1390], [-75.3800, 6.1382]]]
+      },
+      "properties": { "id": "C16", "nombre": "Parqueadero Zona B", "zona": "acceso", "aforo_actual": 210, "indice_densidad": 0.70, "nivel_uso": 4, "capacidad_maxima": 300 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3792, 6.1382], [-75.3784, 6.1382], [-75.3784, 6.1390], [-75.3792, 6.1390], [-75.3792, 6.1382]]]
+      },
+      "properties": { "id": "C17", "nombre": "Entrada Principal / Control Acceso", "zona": "acceso", "aforo_actual": 295, "indice_densidad": 0.84, "nivel_uso": 5, "capacidad_maxima": 350 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3784, 6.1382], [-75.3776, 6.1382], [-75.3776, 6.1390], [-75.3784, 6.1390], [-75.3784, 6.1382]]]
+      },
+      "properties": { "id": "C18", "nombre": "Torniquetes / Primeros Auxilios", "zona": "acceso", "aforo_actual": 194, "indice_densidad": 0.52, "nivel_uso": 3, "capacidad_maxima": 400 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3776, 6.1382], [-75.3768, 6.1382], [-75.3768, 6.1390], [-75.3776, 6.1390], [-75.3776, 6.1382]]]
+      },
+      "properties": { "id": "C19", "nombre": "Cancha de Fútbol 1", "zona": "recreativa", "aforo_actual": 45, "indice_densidad": 0.75, "nivel_uso": 4, "capacidad_maxima": 60 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3768, 6.1382], [-75.3760, 6.1382], [-75.3760, 6.1390], [-75.3768, 6.1390], [-75.3768, 6.1382]]]
+      },
+      "properties": { "id": "C20", "nombre": "Skatepark / Zona Picnic Norte", "zona": "recreativa", "aforo_actual": 142, "indice_densidad": 0.53, "nivel_uso": 3, "capacidad_maxima": 260 }
+    },
+
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3800, 6.1390], [-75.3792, 6.1390], [-75.3792, 6.1398], [-75.3800, 6.1398], [-75.3800, 6.1390]]]
+      },
+      "properties": { "id": "C21", "nombre": "Vestieres Acuático", "zona": "acuatica", "aforo_actual": 54, "indice_densidad": 0.36, "nivel_uso": 2, "capacidad_maxima": 150 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3792, 6.1390], [-75.3784, 6.1390], [-75.3784, 6.1398], [-75.3792, 6.1398], [-75.3792, 6.1390]]]
+      },
+      "properties": { "id": "C22", "nombre": "Piscina Olímpica", "zona": "acuatica", "aforo_actual": 187, "indice_densidad": 0.93, "nivel_uso": 5, "capacidad_maxima": 200 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3784, 6.1390], [-75.3776, 6.1390], [-75.3776, 6.1398], [-75.3784, 6.1398], [-75.3784, 6.1390]]]
+      },
+      "properties": { "id": "C23", "nombre": "Zona de Toboganes", "zona": "acuatica", "aforo_actual": 142, "indice_densidad": 0.85, "nivel_uso": 5, "capacidad_maxima": 167 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3776, 6.1390], [-75.3768, 6.1390], [-75.3768, 6.1398], [-75.3776, 6.1398], [-75.3776, 6.1390]]]
+      },
+      "properties": { "id": "C24", "nombre": "Piscina Infantil / Jacuzzi", "zona": "acuatica", "aforo_actual": 116, "indice_densidad": 0.60, "nivel_uso": 3, "capacidad_maxima": 180 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3768, 6.1390], [-75.3760, 6.1390], [-75.3760, 6.1398], [-75.3768, 6.1398], [-75.3768, 6.1390]]]
+      },
+      "properties": { "id": "C25", "nombre": "Cancha Múltiple A / Cancha de Tenis", "zona": "recreativa", "aforo_actual": 46, "indice_densidad": 0.42, "nivel_uso": 2, "capacidad_maxima": 100 }
+    },
+
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3816, 6.1382], [-75.3808, 6.1382], [-75.3808, 6.1390], [-75.3816, 6.1390], [-75.3816, 6.1382]]]
+      },
+      "properties": { "id": "C26", "nombre": "Centro de Visitantes", "zona": "norte", "aforo_actual": 130, "indice_densidad": 0.65, "nivel_uso": 4, "capacidad_maxima": 200 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3816, 6.1390], [-75.3808, 6.1390], [-75.3808, 6.1398], [-75.3816, 6.1398], [-75.3816, 6.1390]]]
+      },
+      "properties": { "id": "C27", "nombre": "Mirador Norte / Sendero Ecológico A", "zona": "norte", "aforo_actual": 83, "indice_densidad": 0.33, "nivel_uso": 2, "capacidad_maxima": 270 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3824, 6.1390], [-75.3816, 6.1390], [-75.3816, 6.1398], [-75.3824, 6.1398], [-75.3824, 6.1390]]]
+      },
+      "properties": { "id": "C28", "nombre": "Área de Picnic Norte / Zona Forestal", "zona": "norte", "aforo_actual": 101, "indice_densidad": 0.34, "nivel_uso": 2, "capacidad_maxima": 300 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3824, 6.1398], [-75.3816, 6.1398], [-75.3816, 6.1406], [-75.3824, 6.1406], [-75.3824, 6.1398]]]
+      },
+      "properties": { "id": "C29", "nombre": "Zona de Camping / Sendero B", "zona": "norte", "aforo_actual": 92, "indice_densidad": 0.31, "nivel_uso": 2, "capacidad_maxima": 300 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3808, 6.1398], [-75.3800, 6.1398], [-75.3800, 6.1406], [-75.3808, 6.1406], [-75.3808, 6.1398]]]
+      },
+      "properties": { "id": "C30", "nombre": "Sendero Birdwatching / Refugio Ecológico", "zona": "norte", "aforo_actual": 58, "indice_densidad": 0.20, "nivel_uso": 1, "capacidad_maxima": 300 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3800, 6.1398], [-75.3792, 6.1398], [-75.3792, 6.1406], [-75.3800, 6.1406], [-75.3800, 6.1398]]]
+      },
+      "properties": { "id": "C31", "nombre": "Auditorio Norte", "zona": "norte", "aforo_actual": 320, "indice_densidad": 0.94, "nivel_uso": 5, "capacidad_maxima": 340 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3792, 6.1398], [-75.3784, 6.1398], [-75.3784, 6.1406], [-75.3792, 6.1406], [-75.3792, 6.1398]]]
+      },
+      "properties": { "id": "C32", "nombre": "Zona de Merenderos", "zona": "norte", "aforo_actual": 75, "indice_densidad": 0.50, "nivel_uso": 3, "capacidad_maxima": 150 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3768, 6.1398], [-75.3760, 6.1398], [-75.3760, 6.1406], [-75.3768, 6.1406], [-75.3768, 6.1398]]]
+      },
+      "properties": { "id": "C33", "nombre": "Cancha Múltiple B / Área de Escalada", "zona": "recreativa", "aforo_actual": 39, "indice_densidad": 0.33, "nivel_uso": 2, "capacidad_maxima": 120 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3760, 6.1398], [-75.3752, 6.1398], [-75.3752, 6.1406], [-75.3760, 6.1406], [-75.3760, 6.1398]]]
+      },
+      "properties": { "id": "C34", "nombre": "Tirolesa / Zona Extrema", "zona": "recreativa", "aforo_actual": 14, "indice_densidad": 0.70, "nivel_uso": 4, "capacidad_maxima": 20 }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-75.3760, 6.1390], [-75.3752, 6.1390], [-75.3752, 6.1398], [-75.3760, 6.1398], [-75.3760, 6.1390]]]
+      },
+      "properties": { "id": "C35", "nombre": "Zona de Juegos Infantiles", "zona": "recreativa", "aforo_actual": 65, "indice_densidad": 0.81, "nivel_uso": 5, "capacidad_maxima": 80 }
+    }
+  ]
+}
