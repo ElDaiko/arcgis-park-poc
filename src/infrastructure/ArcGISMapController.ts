@@ -68,7 +68,6 @@ export class ArcGISMapController implements IMapService {
     }
 
     esriConfig.apiKey = this.apiKey
-    await projection.load()
 
     if (this.destroyed) {
       return
@@ -103,7 +102,7 @@ export class ArcGISMapController implements IMapService {
       popupEnabled: false,
     })
 
-    await this.view.when()
+    await Promise.all([projection.load(), this.view.when()])
 
     if (this.destroyed || !this.view) {
       return

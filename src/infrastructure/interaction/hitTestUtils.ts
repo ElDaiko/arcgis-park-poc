@@ -38,13 +38,22 @@ export function pickBestGraphicHit(
 }
 
 /**
- * hitTest a veces trae attributes incompletos.
- * Consultamos la capa por OBJECTID y conservamos siempre una geometría usable.
+ * GeoJSONLayer carga todos los datos en cliente, por lo que el graphic del
+ * hitTest ya tiene los atributos completos. Solo hacemos la query de respaldo
+ * si los atributos vienen vacíos (e.g. FeatureLayer remota en el futuro).
  */
 export async function resolveGraphicWithAttributes(
   layer: GeoJSONLayer,
   graphic: Graphic,
 ): Promise<Graphic> {
+  const attrs = graphic.attributes as Record<string, unknown> | null
+  const populated =
+    attrs != null && Object.values(attrs).filter((v) => v != null).length > 1
+
+  if (populated) {
+    return graphic
+  }
+
   const objectId = graphic.getObjectId()
 
   if (objectId == null) {
@@ -63,7 +72,6 @@ export async function resolveGraphicWithAttributes(
     return graphic
   }
 
-  // Si la consulta no trajera geometría, reutilizamos la del hit.
   if (!resolved.geometry && graphic.geometry) {
     resolved.geometry = graphic.geometry.clone()
   }

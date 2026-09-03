@@ -1,7 +1,6 @@
 import LabelClass from '@arcgis/core/layers/support/LabelClass'
 import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
 import Point from '@arcgis/core/geometry/Point'
-import PopupTemplate from '@arcgis/core/PopupTemplate'
 import UniqueValueRenderer from '@arcgis/core/renderers/UniqueValueRenderer'
 import IconSymbol3DLayer from '@arcgis/core/symbols/IconSymbol3DLayer'
 import LabelSymbol3D from '@arcgis/core/symbols/LabelSymbol3D'
@@ -11,6 +10,25 @@ import TextSymbol3DLayer from '@arcgis/core/symbols/TextSymbol3DLayer'
 import { createEsriPinSymbol } from './symbols/esriPins'
 
 export const POIS_GEOJSON_URL = '/data/pois.geojson'
+
+// Lazy singletons — se crean una sola vez y se reutilizan en cada switch 2D/3D.
+let _renderer2d: UniqueValueRenderer | null = null
+let _renderer3d: UniqueValueRenderer | null = null
+let _label2d: LabelClass | null = null
+let _label3d: LabelClass | null = null
+
+function getPoi2dRenderer(): UniqueValueRenderer {
+  return (_renderer2d ??= createPoi2dRenderer())
+}
+function getPoi3dRenderer(): UniqueValueRenderer {
+  return (_renderer3d ??= createPoi3dRenderer())
+}
+function getPoi2dLabelClass(): LabelClass {
+  return (_label2d ??= createPoi2dLabelClass())
+}
+function getPoi3dLabelClass(): LabelClass {
+  return (_label3d ??= createPoi3dLabelClass())
+}
 
 /**
  * Categorías del parque (campo `categoria` en pois.geojson):
@@ -23,41 +41,10 @@ export function createPoiLayer(): GeoJSONLayer {
     title: 'Puntos de interés',
     listMode: 'show',
     popupEnabled: false,
-    outFields: ['*'],
+    outFields: ['nombre', 'categoria', 'descripcion', 'imagen'],
     elevationInfo: { mode: 'relative-to-ground', offset: 2 },
-    renderer: createPoi2dRenderer(),
-    popupTemplate: new PopupTemplate({
-      title: '{nombre}',
-      content: `
-        <div style="font-family: 'Source Sans 3', system-ui, sans-serif; padding: 4px 0;">
-          <p style="margin: 0 0 8px; display: inline-block; padding: 4px 12px; border-radius: 999px; background: #fce3ed; color: #ae004b; font-size: 12px; font-weight: 600;">
-            {categoria}
-          </p>
-          <p style="margin: 0; color: #5b3f45; font-size: 15px; line-height: 1.5;">
-            {descripcion}
-          </p>
-        </div>
-      `,
-    }),
-    labelingInfo: [
-      new LabelClass({
-        labelExpressionInfo: {
-          expression: '$feature.nombre',
-        },
-        symbol: new TextSymbol({
-          color: '#1b1c1c',
-          haloColor: '#ffffff',
-          haloSize: 1.5,
-          font: {
-            family: 'Source Sans 3',
-            size: 10,
-            weight: 'bold',
-          },
-        }),
-        labelPlacement: 'above-center',
-        minScale: 8000,
-      }),
-    ],
+    renderer: getPoi2dRenderer(),
+    labelingInfo: [getPoi2dLabelClass()],
   })
 }
 
@@ -188,10 +175,9 @@ export function setPoiViewMode(
   poiLayer: GeoJSONLayer,
   viewMode: '2d' | '3d',
 ): void {
-  poiLayer.renderer =
-    viewMode === '3d' ? createPoi3dRenderer() : createPoi2dRenderer()
+  poiLayer.renderer = viewMode === '3d' ? getPoi3dRenderer() : getPoi2dRenderer()
   poiLayer.labelingInfo = [
-    viewMode === '3d' ? createPoi3dLabelClass() : createPoi2dLabelClass(),
+    viewMode === '3d' ? getPoi3dLabelClass() : getPoi2dLabelClass(),
   ]
 }
 

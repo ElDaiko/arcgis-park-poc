@@ -1,21 +1,22 @@
-import PictureMarkerSymbol from '@arcgis/core/symbols/PictureMarkerSymbol'
+import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol'
 
-/** Pins estándar del CDN de Esri (Shapes). */
-const ESRI_PINS = {
-  red: 'https://static.arcgis.com/images/Symbols/Shapes/RedPin1LargeB.png',
-  blue: 'https://static.arcgis.com/images/Symbols/Shapes/BluePin1LargeB.png',
-  green: 'https://static.arcgis.com/images/Symbols/Shapes/GreenPin1LargeB.png',
-  yellow: 'https://static.arcgis.com/images/Symbols/Shapes/YellowPin1LargeB.png',
-  orange: 'https://static.arcgis.com/images/Symbols/Shapes/OrangePin1LargeB.png',
+/** Colores semánticos por categoría — sin peticiones externas. */
+const PIN_COLORS = {
+  red: '#db0061',
+  blue: '#2563eb',
+  green: '#008444',
+  yellow: '#ca8a04',
+  orange: '#ea580c',
 } as const
 
 export function createEsriPinSymbol(
-  color: keyof typeof ESRI_PINS,
+  color: keyof typeof PIN_COLORS,
   size = 26,
-): PictureMarkerSymbol {
-  return new PictureMarkerSymbol({
-    url: ESRI_PINS[color],
-    width: `${size}px`,
-    height: `${size}px`,
+): SimpleMarkerSymbol {
+  return new SimpleMarkerSymbol({
+    style: 'circle',
+    color: PIN_COLORS[color],
+    size: `${size}px`,
+    outline: { color: '#ffffff', width: 1.5 },
   })
 }
