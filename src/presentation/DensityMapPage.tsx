@@ -24,6 +24,7 @@ export function DensityMapPage() {
   const [isRendering, setIsRendering] = useState(false)
   const [activeField, setActiveField] = useState<DensityField>('indice_densidad')
   const [error, setError] = useState<string | null>(null)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   useEffect(() => {
     const container = mapContainerRef.current
@@ -107,6 +108,22 @@ export function DensityMapPage() {
 
   const activeFieldMeta = FIELD_OPTIONS.find((f) => f.value === activeField)
 
+  const handleDownloadReport = async () => {
+    if (isDownloading || !controllerRef.current) return
+    setIsDownloading(true)
+    try {
+      await controllerRef.current.downloadReport()
+    } catch (reason) {
+      const message =
+        reason instanceof Error
+          ? reason.message
+          : 'No fue posible generar el informe.'
+      setError(message)
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
   return (
     <main className="map-shell">
       <div
@@ -160,6 +177,15 @@ export function DensityMapPage() {
             indican baja densidad y tonos oscuros/intensos indican alta densidad.
           </p>
         </div>
+
+        <button
+          type="button"
+          className="report-download-btn"
+          onClick={() => void handleDownloadReport()}
+          disabled={isDownloading || isLoading}
+        >
+          {isDownloading ? 'Generando informe…' : '⬇ Descargar informe PDF'}
+        </button>
       </section>
 
       {isLoading && (
