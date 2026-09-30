@@ -1,4 +1,4 @@
-export type AppPage = 'map' | 'density' | 'webmap'
+export type AppPage = 'map' | 'density' | 'webmap' | 'webmap-styled'
 
 interface TabBarProps {
   activePage: AppPage
@@ -9,6 +9,7 @@ const TABS: { id: AppPage; label: string; icon: string }[] = [
   { id: 'map', label: 'Mapa del Parque', icon: '🗺' },
   { id: 'density', label: 'Análisis de Densidad', icon: '📊' },
   { id: 'webmap', label: 'Web Map (AGOL)', icon: '☁️' },
+  { id: 'webmap-styled', label: 'Web Map + estilo local', icon: '🎨' },
 ]
 
 export function TabBar({ activePage, onChange }: TabBarProps) {

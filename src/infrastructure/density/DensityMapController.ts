@@ -9,6 +9,8 @@ import SceneView from '@arcgis/core/views/SceneView'
 import SimpleRenderer from '@arcgis/core/renderers/SimpleRenderer'
 import Legend from '@arcgis/core/widgets/Legend'
 import Expand from '@arcgis/core/widgets/Expand'
+import { buildDensityReportData } from '../reports/densityReportData'
+import { generateDensityReport } from '../reports/pdfReport'
 
 export type DensityField = 'indice_densidad' | 'aforo_actual'
 
@@ -262,6 +264,31 @@ export class DensityMapController {
 
   getCurrentField(): DensityField {
     return this.currentField
+  }
+
+  /**
+   * Genera y descarga el informe PDF de densidad: captura la vista 3D actual,
+   * agrega los datos de las celdas y compone el PDF.
+   */
+  async downloadReport(): Promise<void> {
+    if (!this.view || !this.geoLayer || this.destroyed) {
+      throw new Error('El mapa de densidad no está listo.')
+    }
+
+    let mapImage: string | null = null
+    try {
+      const screenshot = await this.view.takeScreenshot({
+        format: 'png',
+        quality: 90,
+      })
+      mapImage = screenshot.dataUrl
+    } catch {
+      // Si falla la captura, el informe se genera igual sin imagen.
+      mapImage = null
+    }
+
+    const data = await buildDensityReportData(this.geoLayer)
+    generateDensityReport(data, mapImage)
   }
 
   destroy(): void {
