@@ -1,5 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap');
-@import './styles/tokens.css';
+// Estilos globales: fuentes, tema base de ArcGIS, tokens y reset mínimo.
+// Todo lo demás vive en módulos SCSS junto a cada componente.
+@use './tokens';
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+@import url('@arcgis/core/assets/esri/themes/light/main.css');
 
 :root {
   font-family: var(--font-body);

@@ -1,4 +1,5 @@
 import type { Coordinate } from '../domain/Coordinate'
+import styles from './CoordinatePanel.module.scss'
 
 interface CoordinatePanelProps {
   coordinate: Coordinate | null
@@ -11,16 +12,16 @@ export function CoordinatePanel({
   coordinate,
 }: CoordinatePanelProps) {
   return (
-    <aside className="coordinate-panel" aria-live="polite">
-      <div className="coordinate-panel__heading">
-        <span className="coordinate-panel__eyebrow">Ubicación seleccionada</span>
-        <h1>Coordenadas</h1>
+    <aside className={styles.panel} aria-live="polite">
+      <div className={styles.heading}>
+        <span className={styles.eyebrow}>Ubicación seleccionada</span>
+        <h1 className={styles.title}>Coordenadas</h1>
       </div>
 
       {coordinate ? (
-        <div className="coordinate-panel__formats">
+        <div className={styles.formats}>
           <section>
-            <div className="coordinate-panel__label">
+            <div className={styles.label}>
               <strong>WGS84</strong>
               <span>EPSG:4326 · grados</span>
             </div>
@@ -37,7 +38,7 @@ export function CoordinatePanel({
           </section>
 
           <section>
-            <div className="coordinate-panel__label">
+            <div className={styles.label}>
               <strong>MAGNA-SIRGAS Origen Nacional</strong>
               <span>EPSG:9377 · metros</span>
             </div>
@@ -54,7 +55,7 @@ export function CoordinatePanel({
           </section>
         </div>
       ) : (
-        <p className="coordinate-panel__empty">
+        <p className={styles.empty}>
           Haz clic sobre el mapa para consultar las coordenadas.
         </p>
       )}

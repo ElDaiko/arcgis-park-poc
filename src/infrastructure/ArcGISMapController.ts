@@ -1,41 +1,21 @@
 import esriConfig from '@arcgis/core/config'
 import Basemap from '@arcgis/core/Basemap'
 import Map from '@arcgis/core/Map'
-import Point from '@arcgis/core/geometry/Point'
 import * as projection from '@arcgis/core/geometry/projection'
-import SpatialReference from '@arcgis/core/geometry/SpatialReference'
 import type Layer from '@arcgis/core/layers/Layer'
 import type GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
 import MapView from '@arcgis/core/views/MapView'
 import SceneView from '@arcgis/core/views/SceneView'
 import type Expand from '@arcgis/core/widgets/Expand'
 import type LayerList from '@arcgis/core/widgets/LayerList'
-import type { Coordinate } from '../domain/Coordinate'
 import type { IMapService, MapCallbacks } from '../domain/IMapService'
 import type { BasemapId, ViewMode } from '../domain/MapControls'
 import type { PoiCategory } from '../domain/PoiCategory'
-import {
-  createOperationalLayers,
-  getEntranceCoordinates,
-  setPoiViewMode,
-} from './layers'
+import { PARK_CENTER } from '../domain/Park'
+import { createOperationalLayers, setPoiViewMode } from './layers'
 import { buildPoiCategoryExpression } from './filters/poiCategoryFilter'
-import { toMapFeature } from './mappers/mapFeatureMapper'
-import {
-  clearMapSelection,
-  highlightGraphic,
-  setupLayerList,
-  setupLegend,
-  type ActiveView,
-} from './widgets/mapWidgets'
-import {
-  pickBestGraphicHit,
-  resolveGraphicWithAttributes,
-} from './interaction/hitTestUtils'
-
-const WGS84 = new SpatialReference({ wkid: 4326 })
-const MAGNA_SIRGAS_NATIONAL_ORIGIN = new SpatialReference({ wkid: 9377 })
-const FEATURE_ZOOM = 17
+import { MapInteraction } from './interaction/MapInteraction'
+import { setupLayerList, setupLegend, type ActiveView } from './widgets/mapWidgets'
 
 export class ArcGISMapController implements IMapService {
   private readonly apiKey: string
@@ -45,12 +25,13 @@ export class ArcGISMapController implements IMapService {
   private callbacks: MapCallbacks | null = null
   private poiLayer: GeoJSONLayer | null = null
   private temporary3dLayer: Layer | null = null
-  private clickHandle: IHandle | null = null
-  private highlightHandle: IHandle | null = null
+  private interaction: MapInteraction | null = null
   private layerList: LayerList | null = null
   private legendExpand: Expand | null = null
   private interactiveLayers: Layer[] = []
   private viewMode: ViewMode = '2d'
+  /** Cada cambio 2D/3D incrementa el contador; solo el último termina. */
+  private latestViewSwitch = 0
   private destroyed = false
 
   constructor(apiKey: string) {
@@ -80,14 +61,6 @@ export class ArcGISMapController implements IMapService {
     this.container = container
     this.callbacks = callbacks
 
-    const entrance = await getEntranceCoordinates(poiLayer)
-
-    if (this.destroyed) {
-      return
-    }
-
-    const center: [number, number] = [entrance.longitude, entrance.latitude]
-
     this.map = new Map({
       basemap: 'topo-vector',
       ground: 'world-elevation',
@@ -97,7 +70,8 @@ export class ArcGISMapController implements IMapService {
     this.view = new MapView({
       container,
       map: this.map,
-      center,
+      // Centro provisional: al cargar la capa del parque se encuadra su extensión.
+      center: [PARK_CENTER.longitude, PARK_CENTER.latitude],
       zoom: 16,
       popupEnabled: false,
     })
@@ -109,7 +83,6 @@ export class ArcGISMapController implements IMapService {
     }
 
     this.bindUi()
-    this.bindClick()
 
     const parkLayer = layers.find((layer) => layer.id === 'parque') as
       | GeoJSONLayer
@@ -169,6 +142,7 @@ export class ArcGISMapController implements IMapService {
     }
 
     this.viewMode = mode
+    const viewSwitch = ++this.latestViewSwitch
     this.view = mode === '3d'
       ? new SceneView({
           container: this.container,
@@ -185,15 +159,21 @@ export class ArcGISMapController implements IMapService {
           popupEnabled: false,
         })
 
+    // Si llegó otro cambio de vista mientras esperábamos, ese termina el trabajo.
+    const isStale = () =>
+      this.destroyed || viewSwitch !== this.latestViewSwitch || !this.view
+
     await this.view.when()
-    if (this.destroyed || !this.view || !this.poiLayer) {
+    if (isStale() || !this.poiLayer) {
       return
     }
 
     await Promise.all(this.interactiveLayers.map((layer) => layer.when()))
+    if (isStale() || !this.view) {
+      return
+    }
 
     this.bindUi()
-    this.bindClick()
 
     if (mode === '3d') {
       void this.view.goTo(
@@ -209,22 +189,16 @@ export class ArcGISMapController implements IMapService {
   }
 
   clearSelection(): void {
-    if (!this.view) {
-      return
-    }
-
-    this.highlightHandle = clearMapSelection(this.view, this.highlightHandle)
+    this.interaction?.clearSelection()
   }
 
   destroy(): void {
     this.destroyed = true
     this.unbindUi()
 
-    if (this.view) {
-      this.view.map = null as unknown as Map
-      this.view.destroy()
-      this.view = null
-    }
+    // destroy() de la vista destruye también su mapa y capas.
+    this.view?.destroy()
+    this.view = null
 
     this.map?.destroy()
     this.map = null
@@ -236,99 +210,26 @@ export class ArcGISMapController implements IMapService {
   }
 
   private bindUi(): void {
-    if (!this.view || !this.poiLayer) {
+    if (!this.view || !this.poiLayer || !this.callbacks) {
       return
     }
 
     this.view.closePopup()
     this.layerList = setupLayerList(this.view)
     this.legendExpand = setupLegend(this.view, this.poiLayer)
+    this.interaction = new MapInteraction(
+      this.view,
+      this.interactiveLayers,
+      this.callbacks,
+    )
   }
 
   private unbindUi(): void {
-    this.clickHandle?.remove()
-    this.clickHandle = null
-    this.highlightHandle?.remove()
-    this.highlightHandle = null
+    this.interaction?.destroy()
+    this.interaction = null
     this.layerList?.destroy()
     this.legendExpand?.destroy()
     this.layerList = null
     this.legendExpand = null
-  }
-
-  private bindClick(): void {
-    if (!this.view || !this.callbacks) {
-      return
-    }
-
-    this.clickHandle?.remove()
-    this.clickHandle = this.view.on('click', (event) => {
-      if (this.callbacks) {
-        void this.handleMapClick(event, this.callbacks)
-      }
-    })
-  }
-
-  private async handleMapClick(
-    event: __esri.ViewClickEvent,
-    callbacks: MapCallbacks,
-  ): Promise<void> {
-    if (!this.view) {
-      return
-    }
-
-    event.stopPropagation()
-    this.view.closePopup()
-    callbacks.onCoordinateChange(this.convertCoordinate(event.mapPoint))
-
-    const hit = await this.view.hitTest(event, {
-      include: this.interactiveLayers,
-    })
-    const graphicHit = pickBestGraphicHit(hit.results)
-
-    if (!graphicHit) {
-      this.highlightHandle = clearMapSelection(this.view, this.highlightHandle)
-      callbacks.onFeatureSelect(null)
-      return
-    }
-
-    const layer = graphicHit.layer as GeoJSONLayer
-    const graphic = await resolveGraphicWithAttributes(
-      layer,
-      graphicHit.graphic,
-    )
-
-    this.highlightHandle = await highlightGraphic(
-      this.view,
-      layer,
-      graphic,
-      this.highlightHandle,
-    )
-    callbacks.onFeatureSelect(toMapFeature(graphic, layer))
-
-    if (graphic.geometry) {
-      void this.view.goTo(
-        {
-          target: graphic.geometry,
-          zoom: Math.max(this.view.zoom, FEATURE_ZOOM),
-        },
-        { duration: 500 },
-      )
-    }
-  }
-
-  private convertCoordinate(mapPoint: Point): Coordinate {
-    const pointWgs84 = projection.project(mapPoint, WGS84) as Point
-    const pointMagna = projection.project(
-      pointWgs84,
-      MAGNA_SIRGAS_NATIONAL_ORIGIN,
-    ) as Point
-
-    return {
-      latitude: pointWgs84.latitude,
-      longitude: pointWgs84.longitude,
-      x: pointMagna.x,
-      y: pointMagna.y,
-    }
   }
 }

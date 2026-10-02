@@ -1,4 +1,6 @@
-/* Vitality & Social Connection — design tokens */
+// Vitality & Social Connection — design tokens.
+// Se exponen como custom properties (runtime) para que cualquier módulo SCSS
+// las consuma con var(--…).
 :root {
   /* Surfaces */
   --color-background: #fbf9f8;
@@ -61,4 +63,9 @@
   --shadow-card: 0 1px 0 var(--color-border-subtle);
   --shadow-lift: 0 8px 24px rgba(219, 0, 97, 0.1);
   --shadow-panel: 0 4px 20px rgba(48, 48, 48, 0.08);
+  --shadow-button: 0 6px 18px rgba(219, 0, 97, 0.28);
+
+  /* Layout de paneles sobre el mapa */
+  --overlay-inset: var(--space-3);
+  --overlay-gap: 12px;
 }

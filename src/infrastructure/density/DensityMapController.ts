@@ -1,16 +1,15 @@
 import esriConfig from '@arcgis/core/config'
 import Map from '@arcgis/core/Map'
-// Suppress the recurring source-sans-3-bold 404 that fires when popups
-// request that font family, which does not exist on the ArcGIS CDN.
-esriConfig.fontsUrl = 'https://static.arcgis.com/fonts'
-
 import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
 import SceneView from '@arcgis/core/views/SceneView'
 import SimpleRenderer from '@arcgis/core/renderers/SimpleRenderer'
+import ExtrudeSymbol3DLayer from '@arcgis/core/symbols/ExtrudeSymbol3DLayer'
+import PolygonSymbol3D from '@arcgis/core/symbols/PolygonSymbol3D'
+import SolidEdges3D from '@arcgis/core/symbols/edges/SolidEdges3D'
 import Legend from '@arcgis/core/widgets/Legend'
 import Expand from '@arcgis/core/widgets/Expand'
+import { PARK_CENTER } from '../../domain/Park'
 import { buildDensityReportData } from '../reports/densityReportData'
-import { generateDensityReport } from '../reports/pdfReport'
 
 export type DensityField = 'indice_densidad' | 'aforo_actual'
 
@@ -22,8 +21,6 @@ export interface DensityMapCallbacks {
 
 const DENSITY_GEOJSON_URL = '/data/densidad-parques.geojson'
 
-// Centro: parque Comfama Tutucán
-const PARK_CENTER: [number, number] = [-75.3788, 6.1382]
 
 // ---------------------------------------------------------------------------
 // Visual variable configuration per field
@@ -82,7 +79,6 @@ export class DensityMapController {
   private geoLayer: GeoJSONLayer | null = null
   private legendExpand: Expand | null = null
   private destroyed = false
-  private currentField: DensityField = 'indice_densidad'
 
   constructor(apiKey: string) {
     this.apiKey = apiKey
@@ -167,8 +163,8 @@ export class DensityMapController {
       qualityProfile: 'high',
       camera: {
         position: {
-          longitude: PARK_CENTER[0] - 0.012,
-          latitude: PARK_CENTER[1] - 0.032,
+          longitude: PARK_CENTER.longitude - 0.012,
+          latitude: PARK_CENTER.latitude - 0.032,
           z: 2800,
         },
         tilt: 55,
@@ -196,7 +192,9 @@ export class DensityMapController {
     this.legendExpand = new Expand({
       view: this.view,
       content: legend,
-      expanded: true,
+      // Cerrada por defecto (como en las demás pestañas): expandida choca con
+      // el panel lateral en pantallas de poca altura.
+      expanded: false,
       expandTooltip: 'Leyenda',
     })
     this.view.ui.add(this.legendExpand, 'bottom-right')
@@ -214,23 +212,19 @@ export class DensityMapController {
 
   private applyExtrusionRenderer(layer: GeoJSONLayer, field: DensityField): void {
     const cfg = FIELD_CONFIGS[field]
-    this.currentField = field
 
     const renderer = new SimpleRenderer({
-      symbol: {
-        type: 'polygon-3d',
+      symbol: new PolygonSymbol3D({
         symbolLayers: [
-          {
-            type: 'extrude',
+          new ExtrudeSymbol3DLayer({
             material: { color: '#fec44f' },
-            edges: {
-              type: 'solid',
+            edges: new SolidEdges3D({
               color: [0, 0, 0, 0.2],
               size: 0.5,
-            },
-          },
+            }),
+          }),
         ],
-      } as unknown as __esri.PolygonSymbol3D,
+      }),
       visualVariables: [
         {
           type: 'size',
@@ -240,6 +234,8 @@ export class DensityMapController {
           maxDataValue: cfg.maxDataValue,
           minSize: cfg.minSize,
           maxSize: cfg.maxSize,
+          // Sin título, la leyenda muestra el nombre crudo del campo.
+          legendOptions: { title: `${cfg.label} · altura`, showLegend: true },
         } as __esri.SizeVariableProperties,
         {
           type: 'color',
@@ -248,6 +244,7 @@ export class DensityMapController {
             value: s.value,
             color: s.color,
           })),
+          legendOptions: { title: `${cfg.label} · color`, showLegend: true },
         } as __esri.ColorVariableProperties,
       ],
     })
@@ -260,10 +257,6 @@ export class DensityMapController {
   async switchField(field: DensityField): Promise<void> {
     if (!this.geoLayer || !this.view || this.destroyed) return
     this.applyExtrusionRenderer(this.geoLayer, field)
-  }
-
-  getCurrentField(): DensityField {
-    return this.currentField
   }
 
   /**
@@ -288,6 +281,8 @@ export class DensityMapController {
     }
 
     const data = await buildDensityReportData(this.geoLayer)
+    // jsPDF + autotable (~400 kB) se cargan solo al pedir el informe.
+    const { generateDensityReport } = await import('../reports/pdfReport')
     generateDensityReport(data, mapImage)
   }
 
@@ -296,11 +291,9 @@ export class DensityMapController {
     this.legendExpand?.destroy()
     this.legendExpand = null
 
-    if (this.view) {
-      this.view.map = null as unknown as Map
-      this.view.destroy()
-      this.view = null
-    }
+    // destroy() de la vista destruye también su mapa y capas.
+    this.view?.destroy()
+    this.view = null
 
     this.map?.destroy()
     this.map = null

@@ -147,9 +147,12 @@ VITE_WEBMAP_ITEM_ID=8d1123f4d39547e7b2ab47345f3ce711
    dibujan en **WebGL (canvas)**, no en DOM; el CSS no las alcanza. Solo la UI
    alrededor (paneles/modales/tabs) usa CSS. El `FeatureDetailPanel` es un
    componente React con CSS (no el popup nativo de ArcGIS, que está desactivado).
-2. **CSS actual:** CSS global plano (`App.css`, `index.css`, `styles/tokens.css`
-   con variables). No usa SCSS ni CSS Modules (quedó como posible refactor
-   futuro, no hecho).
+2. **Estilos: SCSS Modules.** Cada componente de `presentation/` tiene su
+   `*.module.scss`. Lo global se limita a `styles/global.scss` (fuentes, tema
+   ArcGIS, reset) y `styles/_tokens.scss` (custom properties). Los mixins
+   compartidos (`card`, `eyebrow`, `panel-title`, `mobile`…) están en
+   `styles/_mixins.scss`. Los paneles flotantes se ubican mediante los slots
+   de `MapShell` (ver README → Estilos y layout).
 3. **Reutilización por id canónico:** se normaliza el `id` de las capas del Web
    Map para reutilizar la lógica de hitTest/filtros local sin duplicar.
 4. **Acceso a capas privadas vía API key item access**, no compartición pública
@@ -161,7 +164,7 @@ VITE_WEBMAP_ITEM_ID=8d1123f4d39547e7b2ab47345f3ce711
 
 ---
 
-## 7. Despliegue (en curso — Vercel)
+## 7. Despliegue (Vercel — completado)
 
 Objetivo: URL pública para que el equipo vea la app.
 
@@ -179,15 +182,13 @@ Objetivo: URL pública para que el equipo vea la app.
    y **regenerar la API key**. Actualizar la variable en Vercel y redesplegar.
    Sin esto, el mapa carga en blanco.
 
-**Estado:** se estaban configurando las variables en Vercel. Pendiente:
-confirmar environments de `VITE_ARCGIS_API_KEY` (Production + Preview),
-desplegar, y hacer el ajuste del referrer.
+**Estado:** despliegue completado (confirmado el 2026-10-01).
 
 ---
 
 ## 8. Pendientes / próximos pasos
 
-- [ ] **Terminar deploy en Vercel** y hacer el ajuste del **referrer** en AGOL.
+- [x] **Terminar deploy en Vercel** y hacer el ajuste del **referrer** en AGOL.
 - [ ] **Verificar visualmente** la pestaña 4: confirmar que los **nombres
       (labels) de POIs** ya se ven (se añadió el fix de `labelingInfo`).
 - [ ] **Imágenes de POIs en pestaña 4:** el campo `imagen` existe en AGOL con
@@ -198,7 +199,7 @@ desplegar, y hacer el ajuste del referrer.
 - [ ] (Opcional) Regenerar la API key: quedó **expuesta en capturas de
       pantalla** compartidas durante la sesión. Mitigado por el referrer, pero
       conviene rotarla.
-- [ ] (Opcional) Migrar UI a **CSS Modules o SCSS** (refactor de presentación).
+- [x] Migrar UI a **SCSS Modules** + code-splitting por pestaña y carga diferida del PDF.
 - [ ] (Opcional) Mergear `investigacion-b-webmap` a `main` si se adopta.
 
 ---

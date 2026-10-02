@@ -1,0 +1,106 @@
+@use '../styles/mixins' as *;
+
+.panel {
+  @include card;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+}
+
+.basemap {
+  position: relative;
+}
+
+.basemapToggle {
+  @include button-reset;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 10px 0 4px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  font-size: 0.8125rem;
+  font-weight: 600;
+
+  img {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  &:hover,
+  &.isOpen {
+    border-color: var(--color-primary);
+  }
+}
+
+.gallery {
+  @include card;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 240px;
+  padding: 10px;
+}
+
+.basemapItem {
+  @include button-reset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-on-surface);
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  img {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+  }
+
+  &:hover,
+  &.isActive {
+    border-color: var(--color-primary);
+    background: var(--color-primary-container);
+  }
+}
+
+.viewToggle {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+
+  button {
+    @include button-reset;
+    height: 40px;
+    min-width: 48px;
+    padding: 0 14px;
+    color: var(--color-primary-dim);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  button + button {
+    border-left: 1px solid var(--color-outline-variant);
+  }
+
+  button.isActive {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+}

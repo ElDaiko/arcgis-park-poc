@@ -1,0 +1,197 @@
+@use '../styles/mixins' as *;
+
+// Inset interno que ArcGIS aplica a `.esri-ui-inner-container` (view.ui.padding
+// por defecto) y el alto aproximado de la barra de atribución inferior.
+$esri-ui-inset: 15px;
+$esri-attribution-height: 16px;
+
+.shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-surface-blue);
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+// ─── Grilla de slots sobre el mapa ───
+// pointer-events: none deja pasar los clics al mapa salvo sobre los paneles.
+.overlay {
+  position: absolute;
+  inset: var(--overlay-inset);
+  z-index: 2;
+  display: grid;
+  // Columnas laterales simétricas (1fr) para que el slot central quede
+  // centrado respecto al viewport y no respecto al hueco entre paneles.
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas: 'left center right';
+  gap: var(--overlay-gap);
+  pointer-events: none;
+}
+
+.topLeft,
+.topCenter,
+.rightTop,
+.rightBottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--overlay-gap);
+  min-width: 0;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.topLeft {
+  grid-area: left;
+  align-self: start;
+  justify-self: start;
+  width: min(240px, 100%);
+}
+
+.topCenter {
+  grid-area: center;
+  align-self: start;
+  justify-self: center;
+}
+
+.right {
+  grid-area: right;
+  justify-self: end;
+  width: min(390px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--overlay-gap);
+  min-height: 0;
+}
+
+.rightBottom {
+  margin-top: auto;
+}
+
+// ─── Widgets ArcGIS: se desplazan para no quedar bajo los paneles ───
+// El popup nativo NO se oculta aquí: cada controlador decide con
+// `popupEnabled` (parque y Web Map estilizado usan FeatureDetailPanel;
+// densidad y Web Map AGOL usan el popup nativo).
+.shell :global {
+  .esri-ui-top-left {
+    top: calc(
+      var(--slot-top-left-offset, calc(var(--overlay-inset) - var(--overlay-gap))) +
+        var(--overlay-gap) - #{$esri-ui-inset}
+    );
+    left: calc(var(--overlay-inset) - #{$esri-ui-inset});
+
+    // Mismo ancho que la columna de filtros para que se lean como una pila.
+    .esri-layer-list {
+      width: 240px;
+    }
+  }
+
+  .esri-ui-bottom-right {
+    right: calc(var(--overlay-inset) - #{$esri-ui-inset});
+    bottom: max(
+      0px,
+      calc(
+        var(--slot-bottom-right-offset, 0px) + var(--overlay-gap) -
+          #{$esri-ui-inset + $esri-attribution-height}
+      )
+    );
+  }
+
+  .esri-widget {
+    font-family: var(--font-body);
+    color: var(--color-on-surface);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .esri-widget__heading {
+    font-family: var(--font-headline);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-on-surface);
+  }
+
+  .esri-layer-list__item {
+    border-bottom-color: var(--color-outline-variant);
+  }
+
+  .esri-layer-list__item-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-on-surface);
+  }
+
+  .esri-layer-list__item:hover,
+  .esri-layer-list__item:focus {
+    background-color: var(--color-primary-container);
+  }
+
+  .esri-widget--button {
+    border-radius: var(--radius-md);
+  }
+
+  .esri-widget--button:hover {
+    background-color: var(--color-primary-container);
+    color: var(--color-primary);
+  }
+
+  .esri-view .esri-view-surface::after {
+    outline: none;
+  }
+}
+
+// ─── Móvil: una sola columna; los paneles derechos bajan al pie ───
+@include mobile {
+  .overlay {
+    // Margen inferior extra: la barra de atribución de Esri ocupa el pie.
+    inset: var(--space-2) var(--space-2)
+      calc(var(--space-2) + #{$esri-attribution-height});
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'center'
+      'left'
+      'right';
+    gap: var(--space-1);
+  }
+
+  .topLeft,
+  .right {
+    width: 100%;
+  }
+
+  .right {
+    align-self: end;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
+  .rightBottom {
+    margin-top: 0;
+  }
+
+  .shell :global {
+    .esri-ui-top-left {
+      left: calc(var(--space-2) - #{$esri-ui-inset});
+    }
+
+    .esri-ui-bottom-right {
+      right: calc(var(--space-2) - #{$esri-ui-inset});
+      bottom: max(
+        0px,
+        calc(
+          var(--slot-right-stack-offset, 0px) + var(--space-1) -
+            #{$esri-ui-inset + $esri-attribution-height}
+        )
+      );
+    }
+  }
+}

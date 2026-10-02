@@ -1,6 +1,10 @@
 import type Graphic from '@arcgis/core/Graphic'
+import type FeatureLayer from '@arcgis/core/layers/FeatureLayer'
 import type GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
 import type Layer from '@arcgis/core/layers/Layer'
+
+/** Capas consultables: GeoJSON local o FeatureLayer de AGOL. */
+export type QueryableLayer = FeatureLayer | GeoJSONLayer
 
 /** Prioridad al clic: la capa más específica gana (punto > línea > polígono). */
 const LAYER_HIT_PRIORITY = [
@@ -43,7 +47,7 @@ export function pickBestGraphicHit(
  * si los atributos vienen vacíos (e.g. FeatureLayer remota en el futuro).
  */
 export async function resolveGraphicWithAttributes(
-  layer: GeoJSONLayer,
+  layer: QueryableLayer,
   graphic: Graphic,
 ): Promise<Graphic> {
   const attrs = graphic.attributes as Record<string, unknown> | null

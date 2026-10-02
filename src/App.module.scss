@@ -1,0 +1,19 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.page {
+  position: relative;
+  display: none;
+  flex: 1;
+  min-height: 0;
+}
+
+.isVisible {
+  display: flex;
+}

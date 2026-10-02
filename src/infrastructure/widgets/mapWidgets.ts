@@ -1,5 +1,4 @@
-import type Graphic from '@arcgis/core/Graphic'
-import type GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
+import type Layer from '@arcgis/core/layers/Layer'
 import type MapView from '@arcgis/core/views/MapView'
 import type SceneView from '@arcgis/core/views/SceneView'
 import Expand from '@arcgis/core/widgets/Expand'
@@ -15,7 +14,7 @@ export function setupLayerList(view: ActiveView): LayerList {
   return layerList
 }
 
-export function setupLegend(view: ActiveView, poiLayer: GeoJSONLayer): Expand {
+export function setupLegend(view: ActiveView, poiLayer: Layer): Expand {
   const legend = new Legend({
     view,
     layerInfos: [{ layer: poiLayer, title: 'Categorías del parque' }],
@@ -30,23 +29,4 @@ export function setupLegend(view: ActiveView, poiLayer: GeoJSONLayer): Expand {
 
   view.ui.add(expand, 'bottom-right')
   return expand
-}
-
-export async function highlightGraphic(
-  view: ActiveView,
-  layer: GeoJSONLayer,
-  graphic: Graphic,
-  currentHighlight: IHandle | null,
-): Promise<IHandle | null> {
-  currentHighlight?.remove()
-  const layerView = await view.whenLayerView(layer)
-  return layerView.highlight(graphic)
-}
-
-export function clearMapSelection(
-  _view: ActiveView,
-  highlight: IHandle | null,
-): IHandle | null {
-  highlight?.remove()
-  return null
 }

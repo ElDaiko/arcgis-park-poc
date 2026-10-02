@@ -1,6 +1,5 @@
 import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
-import SimpleRenderer from '@arcgis/core/renderers/SimpleRenderer'
-import SimpleFillSymbol from '@arcgis/core/symbols/SimpleFillSymbol'
+import { createParkRenderer } from './renderers'
 
 export const PARK_BOUNDARY_GEOJSON_URL = '/data/parque.geojson'
 
@@ -14,14 +13,6 @@ export function createParkBoundaryLayer(): GeoJSONLayer {
     elevationInfo: {
       mode: 'on-the-ground',
     },
-    renderer: new SimpleRenderer({
-      symbol: new SimpleFillSymbol({
-        color: [219, 0, 97, 0.22],
-        outline: {
-          color: '#db0061',
-          width: 2,
-        },
-      }),
-    }),
+    renderer: createParkRenderer(),
   })
 }

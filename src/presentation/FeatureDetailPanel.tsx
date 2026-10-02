@@ -1,38 +1,29 @@
+import type { CSSProperties } from 'react'
 import {
   formatCategoryLabel,
   type MapFeature,
 } from '../domain/MapFeature'
+import { isPoiCategory, POI_CATEGORY_META } from '../domain/PoiCategory'
+import styles from './FeatureDetailPanel.module.scss'
 
 interface FeatureDetailPanelProps {
   feature: MapFeature
   onClose: () => void
 }
 
-const CATEGORY_CHIP_CLASS: Record<string, string> = {
-  atraccion: 'feature-panel__chip--atraccion',
-  gastronomia: 'feature-panel__chip--gastronomia',
-  acuatico: 'feature-panel__chip--acuatico',
-  deporte: 'feature-panel__chip--deporte',
-  servicio: 'feature-panel__chip--servicio',
+interface Chip {
+  label: string
+  /** Color de la categoría (catálogo de dominio); sin color usa el chip neutro. */
+  color?: string
 }
 
-function getPrimaryChip(feature: MapFeature): {
-  label: string
-  className: string
-} {
-  if (feature.category) {
-    return {
-      label: formatCategoryLabel(feature.category),
-      className:
-        CATEGORY_CHIP_CLASS[feature.category] ??
-        'feature-panel__chip--primary',
-    }
+function getPrimaryChip(feature: MapFeature): Chip {
+  if (isPoiCategory(feature.category)) {
+    const meta = POI_CATEGORY_META[feature.category]
+    return { label: meta.label, color: meta.color }
   }
 
-  return {
-    label: formatCategoryLabel(feature.type),
-    className: 'feature-panel__chip--primary',
-  }
+  return { label: formatCategoryLabel(feature.category ?? feature.type) }
 }
 
 function getLayerBadge(feature: MapFeature): string | null {
@@ -47,7 +38,9 @@ function getLayerBadge(feature: MapFeature): string | null {
     return null
   }
 
-  if (feature.category && layerTitle === 'Puntos de interés') {
+  // Un POI ya se identifica por su categoría: el nombre de la capa sobra
+  // (sea "Puntos de interés" local o "Punto de Interes" en AGOL).
+  if (isPoiCategory(feature.category)) {
     return null
   }
 
@@ -62,10 +55,10 @@ export function FeatureDetailPanel({
   const primaryChip = getPrimaryChip(feature)
 
   return (
-    <aside className="feature-panel feature-panel--active" aria-live="polite">
+    <aside className={styles.panel} aria-live="polite">
       <button
         type="button"
-        className="feature-panel__close"
+        className={styles.close}
         onClick={onClose}
         aria-label="Cerrar detalle"
       >
@@ -73,37 +66,44 @@ export function FeatureDetailPanel({
       </button>
 
       {feature.imageUrl && (
-        <div className="feature-panel__media">
+        <div className={styles.media}>
           <img
             src={feature.imageUrl}
             alt={`Vista de ${feature.name}`}
-            className="feature-panel__image"
+            className={styles.image}
             loading="lazy"
           />
         </div>
       )}
 
-      <div className="feature-panel__content">
-        <div className="feature-panel__heading">
-          <span className="feature-panel__eyebrow">Elemento seleccionado</span>
-          <h2>{feature.name}</h2>
+      <div className={styles.content}>
+        <div className={styles.heading}>
+          <span className={styles.eyebrow}>Elemento seleccionado</span>
+          <h2 className={styles.title}>{feature.name}</h2>
         </div>
 
-        <div className="feature-panel__body">
-          <p className="feature-panel__meta">
-            <span className={`feature-panel__chip ${primaryChip.className}`}>
+        <div className={styles.body}>
+          <p className={styles.meta}>
+            <span
+              className={`${styles.chip} ${primaryChip.color ? styles.chipCategory : styles.chipPrimary}`}
+              style={
+                primaryChip.color
+                  ? ({ '--chip-color': primaryChip.color } as CSSProperties)
+                  : undefined
+              }
+            >
               {primaryChip.label}
             </span>
             {layerBadge && (
-              <span className="feature-panel__chip feature-panel__chip--secondary">
+              <span className={`${styles.chip} ${styles.chipSecondary}`}>
                 {layerBadge}
               </span>
             )}
           </p>
           {feature.description ? (
-            <p className="feature-panel__description">{feature.description}</p>
+            <p className={styles.description}>{feature.description}</p>
           ) : (
-            <p className="feature-panel__description feature-panel__description--muted">
+            <p className={`${styles.description} ${styles.descriptionMuted}`}>
               Sin descripción disponible.
             </p>
           )}

@@ -1,7 +1,7 @@
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol'
 
-/** Colores semánticos por categoría — sin peticiones externas. */
-const PIN_COLORS = {
+/** Colores semánticos de los pins de infraestructura — sin peticiones externas. */
+export const PIN_COLORS = {
   red: '#db0061',
   blue: '#2563eb',
   green: '#008444',
@@ -9,14 +9,19 @@ const PIN_COLORS = {
   orange: '#ea580c',
 } as const
 
+/** Pin circular con borde blanco del color indicado. */
+export function createPinSymbol(color: string, size = 26): SimpleMarkerSymbol {
+  return new SimpleMarkerSymbol({
+    style: 'circle',
+    color,
+    size: `${size}px`,
+    outline: { color: '#ffffff', width: 1.5 },
+  })
+}
+
 export function createEsriPinSymbol(
   color: keyof typeof PIN_COLORS,
   size = 26,
 ): SimpleMarkerSymbol {
-  return new SimpleMarkerSymbol({
-    style: 'circle',
-    color: PIN_COLORS[color],
-    size: `${size}px`,
-    outline: { color: '#ffffff', width: 1.5 },
-  })
+  return createPinSymbol(PIN_COLORS[color], size)
 }

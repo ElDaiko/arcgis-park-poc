@@ -1,3 +1,5 @@
+import styles from './TabBar.module.scss'
+
 export type AppPage = 'map' | 'density' | 'webmap' | 'webmap-styled'
 
 interface TabBarProps {
@@ -5,16 +7,16 @@ interface TabBarProps {
   onChange: (page: AppPage) => void
 }
 
-const TABS: { id: AppPage; label: string; icon: string }[] = [
-  { id: 'map', label: 'Mapa del Parque', icon: '🗺' },
-  { id: 'density', label: 'Análisis de Densidad', icon: '📊' },
-  { id: 'webmap', label: 'Web Map (AGOL)', icon: '☁️' },
-  { id: 'webmap-styled', label: 'Web Map + estilo local', icon: '🎨' },
+const TABS: { id: AppPage; label: string; shortLabel: string; icon: string }[] = [
+  { id: 'map', label: 'Mapa del Parque', shortLabel: 'Parque', icon: '🗺' },
+  { id: 'density', label: 'Análisis de Densidad', shortLabel: 'Densidad', icon: '📊' },
+  { id: 'webmap', label: 'Web Map (AGOL)', shortLabel: 'AGOL', icon: '☁️' },
+  { id: 'webmap-styled', label: 'Web Map + estilo local', shortLabel: 'Estilizado', icon: '🎨' },
 ]
 
 export function TabBar({ activePage, onChange }: TabBarProps) {
   return (
-    <nav className="tab-bar" aria-label="Páginas de la aplicación">
+    <nav className={styles.bar} aria-label="Páginas de la aplicación">
       {TABS.map((tab) => (
         <button
           key={tab.id}
@@ -22,14 +24,17 @@ export function TabBar({ activePage, onChange }: TabBarProps) {
           role="tab"
           aria-selected={tab.id === activePage}
           className={
-            tab.id === activePage ? 'tab-bar__tab is-active' : 'tab-bar__tab'
+            tab.id === activePage ? `${styles.tab} ${styles.isActive}` : styles.tab
           }
           onClick={() => onChange(tab.id)}
         >
-          <span className="tab-bar__icon" aria-hidden="true">
+          <span className={styles.icon} aria-hidden="true">
             {tab.icon}
           </span>
-          <span className="tab-bar__label">{tab.label}</span>
+          <span className={styles.label}>{tab.label}</span>
+          <span className={styles.shortLabel} aria-hidden="true">
+            {tab.shortLabel}
+          </span>
         </button>
       ))}
     </nav>

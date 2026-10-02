@@ -1,0 +1,112 @@
+@use '../styles/mixins' as *;
+
+.panel {
+  @include card;
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(219, 0, 97, 0.15);
+  box-shadow: var(--shadow-lift);
+}
+
+.close {
+  @include button-reset;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-on-surface);
+  font-size: 1.35rem;
+  line-height: 1;
+  box-shadow: var(--shadow-panel);
+
+  &:hover {
+    background: var(--color-primary-container);
+    color: var(--color-primary);
+  }
+}
+
+.media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--color-surface-container);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.content {
+  padding: var(--space-2);
+
+  @include mobile {
+    padding: 14px;
+  }
+}
+
+.heading {
+  @include panel-heading;
+  padding-right: 28px;
+}
+
+.eyebrow {
+  @include eyebrow(var(--color-secondary));
+}
+
+.title {
+  @include panel-title;
+}
+
+.body {
+  padding-top: 12px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0 0 12px;
+}
+
+.chip {
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.chipPrimary {
+  background: var(--color-tertiary-container);
+  color: var(--color-primary-dim);
+}
+
+.chipSecondary {
+  background: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+}
+
+// Fondo y texto derivados del color de la categoría (POI_CATEGORY_META).
+.chipCategory {
+  background: color-mix(in srgb, var(--chip-color) 14%, white);
+  color: color-mix(in srgb, var(--chip-color) 72%, black);
+}
+
+.description {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-on-surface-variant);
+}
+
+.descriptionMuted {
+  color: var(--color-outline);
+  font-style: italic;
+}

@@ -1,3 +1,5 @@
+import { POI_CATEGORIES, POI_CATEGORY_META } from './PoiCategory'
+
 /** Feature del parque seleccionado en el mapa (sin dependencias de ArcGIS). */
 export interface MapFeature {
   name: string
@@ -11,12 +13,13 @@ export interface MapFeature {
   imageUrl?: string
 }
 
-export const CATEGORY_LABELS: Record<string, string> = {
-  atraccion: 'Atracción',
-  gastronomia: 'Gastronomía',
-  acuatico: 'Acuático',
-  deporte: 'Deporte',
-  servicio: 'Servicio',
+const POI_CATEGORY_LABELS = Object.fromEntries(
+  POI_CATEGORIES.map((category) => [category, POI_CATEGORY_META[category].label]),
+)
+
+/** Nombres legibles: categorías de POI + tipos de las demás capas. */
+const CATEGORY_LABELS: Record<string, string> = {
+  ...POI_CATEGORY_LABELS,
   punto_interes: 'Punto de interés',
   zona_principal: 'Zona principal',
   sendero_principal: 'Sendero principal',

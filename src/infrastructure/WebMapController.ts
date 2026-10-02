@@ -135,12 +135,11 @@ export class WebMapController {
     this.layerListExpand = null
     this.legendExpand = null
 
-    if (this.view) {
-      this.view.map = null as unknown as WebMap
-      this.view.destroy()
-      this.view = null
-    }
+    // destroy() de la vista destruye también su mapa y capas.
+    this.view?.destroy()
+    this.view = null
 
+    this.webMap?.destroy()
     this.webMap = null
   }
 }

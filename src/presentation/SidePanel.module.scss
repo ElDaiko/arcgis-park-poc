@@ -1,0 +1,24 @@
+@use '../styles/mixins' as *;
+
+.panel {
+  @include card;
+  padding: var(--space-2);
+}
+
+.heading {
+  @include panel-heading;
+}
+
+.eyebrow {
+  @include eyebrow;
+}
+
+.title {
+  @include panel-title;
+}
+
+.body {
+  display: grid;
+  gap: 12px;
+  padding-top: 12px;
+}

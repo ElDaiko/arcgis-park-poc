@@ -1,38 +1,20 @@
 import esriConfig from '@arcgis/core/config'
 import Basemap from '@arcgis/core/Basemap'
-import Point from '@arcgis/core/geometry/Point'
 import * as projection from '@arcgis/core/geometry/projection'
-import SpatialReference from '@arcgis/core/geometry/SpatialReference'
 import type Layer from '@arcgis/core/layers/Layer'
 import type FeatureLayer from '@arcgis/core/layers/FeatureLayer'
-import type GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
 import WebMap from '@arcgis/core/WebMap'
 import MapView from '@arcgis/core/views/MapView'
 import type Expand from '@arcgis/core/widgets/Expand'
 import type LayerList from '@arcgis/core/widgets/LayerList'
-import type { Coordinate } from '../domain/Coordinate'
 import type { IMapService, MapCallbacks } from '../domain/IMapService'
 import type { BasemapId, ViewMode } from '../domain/MapControls'
 import type { PoiCategory } from '../domain/PoiCategory'
 import { buildPoiCategoryExpression } from './filters/poiCategoryFilter'
-import { toMapFeature } from './mappers/mapFeatureMapper'
-import {
-  clearMapSelection,
-  highlightGraphic,
-  setupLayerList,
-  setupLegend,
-} from './widgets/mapWidgets'
-import {
-  pickBestGraphicHit,
-  resolveGraphicWithAttributes,
-} from './interaction/hitTestUtils'
-import { prepareWebMapLayer } from './webmap/localStyleRenderers'
+import { MapInteraction } from './interaction/MapInteraction'
+import { setupLayerList, setupLegend } from './widgets/mapWidgets'
+import { prepareWebMapLayer } from './webmap/webMapLayers'
 import { buildWebMapReportData } from './reports/webMapReportData'
-import { generateWebMapReport } from './reports/pdfReport'
-
-const WGS84 = new SpatialReference({ wkid: 4326 })
-const MAGNA_SIRGAS_NATIONAL_ORIGIN = new SpatialReference({ wkid: 9377 })
-const FEATURE_ZOOM = 17
 
 /**
  * Investigación B (avanzada): carga el Web Map alojado en AGOL y reproduce
@@ -56,8 +38,7 @@ export class StyledWebMapController implements IMapService {
   private trailLayer: FeatureLayer | null = null
   private infrastructureLayer: FeatureLayer | null = null
   private interactiveLayers: Layer[] = []
-  private clickHandle: IHandle | null = null
-  private highlightHandle: IHandle | null = null
+  private interaction: MapInteraction | null = null
   private layerList: LayerList | null = null
   private legendExpand: Expand | null = null
   private destroyed = false
@@ -126,7 +107,6 @@ export class StyledWebMapController implements IMapService {
     this.interactiveLayers = interactive
 
     this.bindUi()
-    this.bindClick()
 
     // Encuadra al parque, igual que el mapa local.
     const parkLayer = interactive.find((layer) => layer.id === 'parque')
@@ -159,11 +139,7 @@ export class StyledWebMapController implements IMapService {
   }
 
   clearSelection(): void {
-    if (!this.view) {
-      return
-    }
-
-    this.highlightHandle = clearMapSelection(this.view, this.highlightHandle)
+    this.interaction?.clearSelection()
   }
 
   /**
@@ -191,6 +167,8 @@ export class StyledWebMapController implements IMapService {
       trails: this.trailLayer,
       infrastructure: this.infrastructureLayer,
     })
+    // jsPDF + autotable (~400 kB) se cargan solo al pedir el informe.
+    const { generateWebMapReport } = await import('./reports/pdfReport')
     generateWebMapReport(data, mapImage, this.webMapItemId)
   }
 
@@ -198,12 +176,11 @@ export class StyledWebMapController implements IMapService {
     this.destroyed = true
     this.unbindUi()
 
-    if (this.view) {
-      this.view.map = null as unknown as WebMap
-      this.view.destroy()
-      this.view = null
-    }
+    // destroy() de la vista destruye también su mapa y capas.
+    this.view?.destroy()
+    this.view = null
 
+    this.webMap?.destroy()
     this.webMap = null
     this.callbacks = null
     this.poiLayer = null
@@ -213,103 +190,26 @@ export class StyledWebMapController implements IMapService {
   }
 
   private bindUi(): void {
-    if (!this.view || !this.poiLayer) {
+    if (!this.view || !this.poiLayer || !this.callbacks) {
       return
     }
 
     this.view.closePopup()
     this.layerList = setupLayerList(this.view)
-    // setupLegend espera GeoJSONLayer; FeatureLayer es compatible para Legend.
-    this.legendExpand = setupLegend(
+    this.legendExpand = setupLegend(this.view, this.poiLayer)
+    this.interaction = new MapInteraction(
       this.view,
-      this.poiLayer as unknown as GeoJSONLayer,
+      this.interactiveLayers,
+      this.callbacks,
     )
   }
 
   private unbindUi(): void {
-    this.clickHandle?.remove()
-    this.clickHandle = null
-    this.highlightHandle?.remove()
-    this.highlightHandle = null
+    this.interaction?.destroy()
+    this.interaction = null
     this.layerList?.destroy()
     this.legendExpand?.destroy()
     this.layerList = null
     this.legendExpand = null
-  }
-
-  private bindClick(): void {
-    if (!this.view || !this.callbacks) {
-      return
-    }
-
-    this.clickHandle?.remove()
-    this.clickHandle = this.view.on('click', (event) => {
-      if (this.callbacks) {
-        void this.handleMapClick(event, this.callbacks)
-      }
-    })
-  }
-
-  private async handleMapClick(
-    event: __esri.ViewClickEvent,
-    callbacks: MapCallbacks,
-  ): Promise<void> {
-    if (!this.view) {
-      return
-    }
-
-    event.stopPropagation()
-    this.view.closePopup()
-    callbacks.onCoordinateChange(this.convertCoordinate(event.mapPoint))
-
-    const hit = await this.view.hitTest(event, {
-      include: this.interactiveLayers,
-    })
-    const graphicHit = pickBestGraphicHit(hit.results)
-
-    if (!graphicHit) {
-      this.highlightHandle = clearMapSelection(this.view, this.highlightHandle)
-      callbacks.onFeatureSelect(null)
-      return
-    }
-
-    const layer = graphicHit.layer as GeoJSONLayer
-    const graphic = await resolveGraphicWithAttributes(
-      layer,
-      graphicHit.graphic,
-    )
-
-    this.highlightHandle = await highlightGraphic(
-      this.view,
-      layer,
-      graphic,
-      this.highlightHandle,
-    )
-    callbacks.onFeatureSelect(toMapFeature(graphic, layer))
-
-    if (graphic.geometry) {
-      void this.view.goTo(
-        {
-          target: graphic.geometry,
-          zoom: Math.max(this.view.zoom, FEATURE_ZOOM),
-        },
-        { duration: 500 },
-      )
-    }
-  }
-
-  private convertCoordinate(mapPoint: Point): Coordinate {
-    const pointWgs84 = projection.project(mapPoint, WGS84) as Point
-    const pointMagna = projection.project(
-      pointWgs84,
-      MAGNA_SIRGAS_NATIONAL_ORIGIN,
-    ) as Point
-
-    return {
-      latitude: pointWgs84.latitude,
-      longitude: pointWgs84.longitude,
-      x: pointMagna.x,
-      y: pointMagna.y,
-    }
   }
 }

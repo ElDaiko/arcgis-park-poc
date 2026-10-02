@@ -1,0 +1,37 @@
+.note {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-on-surface-variant);
+}
+
+.layers {
+  padding-top: 10px;
+  border-top: 1px solid var(--color-surface-container-high);
+}
+
+.layersTitle {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+}
+
+.layerList {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 6px 10px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-container-low);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+}

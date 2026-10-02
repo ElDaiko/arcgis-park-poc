@@ -1,6 +1,5 @@
 import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer'
-import UniqueValueRenderer from '@arcgis/core/renderers/UniqueValueRenderer'
-import SimpleLineSymbol from '@arcgis/core/symbols/SimpleLineSymbol'
+import { createTrailsRenderer } from './renderers'
 
 export const TRAILS_GEOJSON_URL = '/data/senderos.geojson'
 
@@ -14,29 +13,6 @@ export function createTrailsLayer(): GeoJSONLayer {
     elevationInfo: {
       mode: 'on-the-ground',
     },
-    renderer: new UniqueValueRenderer({
-      field: 'tipo',
-      defaultSymbol: new SimpleLineSymbol({
-        color: '#008444',
-        width: 3,
-      }),
-      uniqueValueInfos: [
-        {
-          value: 'sendero_principal',
-          symbol: new SimpleLineSymbol({
-            color: '#008444',
-            width: 4,
-          }),
-        },
-        {
-          value: 'acceso_discapacitados',
-          symbol: new SimpleLineSymbol({
-            color: '#006d37',
-            width: 3,
-            style: 'dash',
-          }),
-        },
-      ],
-    }),
+    renderer: createTrailsRenderer(),
   })
 }

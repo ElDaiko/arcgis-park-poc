@@ -1,5 +1,6 @@
 import type { PoiCategory } from '../domain/PoiCategory'
 import { POI_CATEGORIES, POI_CATEGORY_META } from '../domain/PoiCategory'
+import styles from './CategoryFilterPanel.module.scss'
 
 interface CategoryFilterPanelProps {
   selected: readonly PoiCategory[]
@@ -31,41 +32,41 @@ export function CategoryFilterPanel({
   }
 
   return (
-    <aside className="category-filter" aria-label="Filtro por categoría">
-      <div className="category-filter__heading">
-        <span className="category-filter__eyebrow">Explorar</span>
-        <h2>Categorías</h2>
+    <aside className={styles.panel} aria-label="Filtro por categoría">
+      <div className={styles.heading}>
+        <span className={styles.eyebrow}>Explorar</span>
+        <h2 className={styles.title}>Categorías</h2>
       </div>
 
-      <ul className="category-filter__list">
+      <ul className={styles.list}>
         {POI_CATEGORIES.map((category) => {
           const meta = POI_CATEGORY_META[category]
           const checked = selectedSet.has(category)
 
           return (
             <li key={category}>
-              <label className="category-filter__item">
+              <label className={styles.item}>
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggle(category)}
                 />
                 <span
-                  className="category-filter__swatch"
-                  style={{ background: meta.swatch }}
+                  className={styles.swatch}
+                  style={{ background: meta.color }}
                   aria-hidden="true"
                 />
-                <span className="category-filter__label">{meta.label}</span>
+                <span className={styles.label}>{meta.label}</span>
               </label>
             </li>
           )
         })}
       </ul>
 
-      <div className="category-filter__actions">
+      <div className={styles.actions}>
         <button
           type="button"
-          className="category-filter__button"
+          className={styles.button}
           onClick={selectAll}
           disabled={allSelected}
         >
@@ -73,7 +74,7 @@ export function CategoryFilterPanel({
         </button>
         <button
           type="button"
-          className="category-filter__button category-filter__button--ghost"
+          className={styles.button}
           onClick={clearAll}
           disabled={selected.length === 0}
         >

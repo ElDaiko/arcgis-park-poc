@@ -2,14 +2,25 @@
 
 Prueba de concepto de un mapa interactivo para el **Parque Recreativo Comfama Tutucán** (Rionegro, Antioquia). Visualiza el contorno del parque, senderos, puntos de interés, permite activar/desactivar capas, seleccionar elementos con highlight y consultar coordenadas en WGS84 y MAGNA-SIRGAS al hacer clic.
 
+La app tiene **4 pestañas**:
+
+| Pestaña | Fuente de datos | Qué muestra |
+| ------- | --------------- | ----------- |
+| Mapa del Parque | GeoJSON local (`public/data/`) | Estilo e interactividad 100 % en código (2D/3D, filtros, detalle, coordenadas) |
+| Análisis de Densidad | `densidad-parques.geojson` | Extrusión 3D por celdas de grilla + informe PDF |
+| Web Map (AGOL) | Web Map alojado en ArcGIS Online | Capas, estilos y popups tal como vienen de AGOL |
+| Web Map + estilo local | El mismo Web Map de AGOL | El front sobrescribe estilos e interactividad para igualar la pestaña 1 + informe PDF |
+
+Contexto de la investigación y recursos de AGOL: [`docs/CONTEXTO-INVESTIGACION-B.md`](docs/CONTEXTO-INVESTIGACION-B.md).
+
 Construido con **Vite**, **React**, **TypeScript** y **ArcGIS Maps SDK for JavaScript** (`@arcgis/core`).
 
 ---
 
 ## Características
 
-- Mapa base topográfico centrado en la entrada del parque (zoom 16).
-- **Basemap + vista 2D/3D:** `BasemapGallery` de Esri (miniaturas) y toggle MapView ↔ SceneView.
+- Mapa base topográfico que encuadra automáticamente la extensión del parque.
+- **Basemap + vista 2D/3D:** galería propia con miniaturas (`MapControlsPanel`) y toggle MapView ↔ SceneView.
 - **4 capas GeoJSON** independientes (una geometría por archivo):
   - `parque.geojson` — polígono del parque
   - `senderos.geojson` — rutas peatonales (Polyline)
@@ -60,33 +71,39 @@ Abre `http://localhost:5173`.
 
 ```
 natural-park-gis-poc/
-├── public/data/
-│   ├── parque.geojson       # Polygon — contorno del parque
-│   ├── senderos.geojson     # LineString — rutas peatonales
-│   ├── infraestructura.geojson  # Point — baños, parqueadero, etc.
-│   └── pois.geojson         # Point — entrada y POIs
+├── public/
+│   ├── data/                    # GeoJSON locales (una geometría por archivo)
+│   │   ├── parque.geojson       # Polygon — contorno del parque
+│   │   ├── senderos.geojson     # MultiLineString — rutas peatonales
+│   │   ├── infraestructura.geojson  # Point — baños, primeros auxilios, etc.
+│   │   ├── pois.geojson         # Point — entrada y POIs
+│   │   └── densidad-parques.geojson # Polygon — grilla de densidad
+│   ├── images/                  # Fotos de features (campo `imagen`)
+│   └── basemaps/                # Miniaturas de la galería de mapas base
 ├── src/
-│   ├── domain/
-│   │   ├── Coordinate.ts    # lat/lng + X/Y
-│   │   ├── MapFeature.ts    # feature seleccionado (sin ArcGIS)
-│   │   └── IMapService.ts   # contrato del mapa
-│   ├── infrastructure/
-│   │   ├── ArcGISMapController.ts   # orquestador del mapa
-│   │   ├── layers/                  # fábricas GeoJSONLayer
-│   │   │   ├── parkLayer.ts
-│   │   │   ├── trailsLayer.ts
-│   │   │   ├── infrastructureLayer.ts
-│   │   │   ├── poiLayer.ts
-│   │   │   ├── symbols/esriPins.ts
-│   │   │   └── index.ts
-│   │   ├── mappers/
-│   │   │   └── mapFeatureMapper.ts  # Graphic → MapFeature
-│   │   └── widgets/
-│   │       └── mapWidgets.ts        # LayerList, highlight, legend
-│   └── presentation/
-│       ├── MapComponent.tsx
-│       ├── CoordinatePanel.tsx
-│       └── FeatureDetailPanel.tsx
+│   ├── domain/                  # Tipos y contratos sin ArcGIS
+│   │   ├── IMapService.ts       # Contrato de los mapas interactivos
+│   │   ├── Coordinate.ts · MapFeature.ts · MapControls.ts
+│   │   ├── PoiCategory.ts       # Categorías de POIs
+│   │   └── Park.ts              # Centro del parque
+│   ├── infrastructure/          # Todo lo que usa @arcgis/core
+│   │   ├── ArcGISMapController.ts       # Pestaña 1 (GeoJSON local)
+│   │   ├── StyledWebMapController.ts    # Pestaña 4 (Web Map + estilo local)
+│   │   ├── WebMapController.ts          # Pestaña 3 (Web Map AGOL)
+│   │   ├── density/DensityMapController.ts  # Pestaña 2
+│   │   ├── layers/              # Fábricas de capas + símbolos
+│   │   ├── webmap/              # Renderers locales aplicados al Web Map
+│   │   ├── interaction/         # hitTest
+│   │   ├── filters/ · mappers/ · widgets/
+│   │   └── reports/             # Datos e informe PDF (jsPDF, carga diferida)
+│   ├── presentation/            # React (sin @arcgis/core)
+│   │   ├── *Page.tsx · MapComponent.tsx  # Una página por pestaña
+│   │   ├── MapShell.tsx         # Layout común con slots para paneles
+│   │   ├── *Panel.tsx           # Paneles flotantes
+│   │   └── *.module.scss        # Estilos de cada componente
+│   ├── styles/                  # global.scss, _tokens.scss, _mixins.scss
+│   └── App.tsx                  # TabBar + carga diferida de pestañas
+├── docs/                        # Design system y contexto de la investigación
 └── .env.example
 ```
 
@@ -95,12 +112,14 @@ natural-park-gis-poc/
 ## Arquitectura
 
 ```
-presentation/          domain/              infrastructure/
-─────────────          ───────              ────────────────
-MapComponent      →    IMapService     ←    ArcGISMapController
-CoordinatePanel        Coordinate            ├── layers/
-FeatureDetailPanel     MapFeature            ├── mappers/
-                                             └── widgets/
+presentation/            domain/              infrastructure/
+─────────────            ───────              ────────────────
+MapComponent        →    IMapService     ←    ArcGISMapController
+StyledWebMapPage    →    IMapService     ←    StyledWebMapController
+DensityMapPage      ─────────────────────→    DensityMapController
+WebMapPage          ─────────────────────→    WebMapController
+MapShell + paneles       Coordinate, MapFeature,
+                         PoiCategory, Park
 ```
 
 ### Regla principal
@@ -132,8 +151,8 @@ ArcGISMapController.handleMapClick()
 
 | Orden | ID | Archivo | Geometría | Estilo |
 | ----- | -- | ------- | --------- | ------ |
-| 1 (abajo) | `parque` | `parque.geojson` | Polygon | Verde semitransparente |
-| 2 | `senderos` | `senderos.geojson` | LineString | Marrón / azul punteado |
+| 1 (abajo) | `parque` | `parque.geojson` | Polygon | Magenta semitransparente (`#db0061`) |
+| 2 | `senderos` | `senderos.geojson` | LineString | Verde por `tipo` (punteado = acceso universal) |
 | 3 | `infraestructura` | `infraestructura.geojson` | Point | Pins Esri por `tipo` |
 | 4 (arriba) | `pois` | `pois.geojson` | Point | Pins Esri por `categoria` |
 
@@ -237,11 +256,40 @@ Requiere `@arcgis/core@4.31.6` (`projection.load()` + `projection.project()`).
 
 ---
 
+## Estilos y layout
+
+- **SCSS Modules:** cada componente de `src/presentation/` tiene su `*.module.scss`
+  (clases con hash, sin colisiones). Lo global se limita a
+  `src/styles/global.scss` (fuentes, tema ArcGIS, reset) y
+  `src/styles/_tokens.scss` (custom properties del design system).
+- **Mixins** en `src/styles/_mixins.scss`: `card`, `panel-heading`, `eyebrow`,
+  `panel-title`, `button-reset` y el breakpoint `mobile` (≤ 640 px).
+  Uso: `@use '../styles/mixins' as *;`.
+- **`MapShell`** es el contenedor de todas las páginas de mapa. Expone slots
+  (`topLeft`, `topCenter`, `topRight`, `bottomRight`) sobre una grilla, así los
+  paneles se apilan en vez de solaparse. Mide los slots y desplaza los widgets
+  nativos de ArcGIS (zoom/LayerList arriba a la izquierda, Legend abajo a la
+  derecha) para que no queden tapados. En móvil todo pasa a una columna.
+- Las geometrías del mapa se pintan en WebGL: su estilo vive en los renderers
+  (`infrastructure/`), no en SCSS.
+
+---
+
+## Rendimiento
+
+- Cada pestaña se carga con `React.lazy`: el bundle inicial ya no incluye
+  ArcGIS completo (SceneView, WebMap, etc. llegan al abrir su pestaña).
+- `jspdf` + `jspdf-autotable` se importan dinámicamente al pulsar
+  "Descargar informe PDF".
+
+---
+
 ## Variables de entorno
 
 | Variable | Descripción | Obligatoria |
 | -------- | ----------- | ----------- |
 | `VITE_ARCGIS_API_KEY` | API Key ArcGIS Developer | Sí |
+| `VITE_WEBMAP_ITEM_ID` | Item ID del Web Map en AGOL (pestañas Web Map) | Sí, para pestañas 3 y 4 |
 
 ---
 
@@ -250,7 +298,7 @@ Requiere `@arcgis/core@4.31.6` (`projection.load()` + `projection.project()`).
 - [x] Capa `infraestructura.geojson` (baños, parqueaderos) con pins Esri
 - [x] Panel React de filtros por categoría (`CategoryFilterPanel`)
 - [ ] Widget Sketch para dibujar y exportar geometrías
-- [ ] Heatmap de densidad de visitantes
+- [x] Análisis de densidad de visitantes (extrusión 3D por grilla)
 
 ---
 

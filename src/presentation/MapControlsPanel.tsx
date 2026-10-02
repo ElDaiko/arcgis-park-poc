@@ -4,12 +4,14 @@ import {
   type BasemapId,
   type ViewMode,
 } from '../domain/MapControls'
+import styles from './MapControlsPanel.module.scss'
 
 interface MapControlsPanelProps {
   basemapId: BasemapId
   viewMode: ViewMode
   onBasemapChange: (id: BasemapId) => void
-  onViewModeChange: (mode: ViewMode) => void
+  /** Omitir en vistas que no soportan 3D: oculta el toggle 2D/3D. */
+  onViewModeChange?: (mode: ViewMode) => void
 }
 
 export function MapControlsPanel({
@@ -47,16 +49,16 @@ export function MapControlsPanel({
   return (
     <aside
       ref={rootRef}
-      className="map-controls"
+      className={styles.panel}
       aria-label="Controles del mapa"
     >
-      <div className="map-controls__basemap">
+      <div className={styles.basemap}>
         <button
           type="button"
           className={
             galleryOpen
-              ? 'map-controls__basemap-toggle is-open'
-              : 'map-controls__basemap-toggle'
+              ? `${styles.basemapToggle} ${styles.isOpen}`
+              : styles.basemapToggle
           }
           aria-expanded={galleryOpen}
           aria-controls={labelId}
@@ -75,7 +77,7 @@ export function MapControlsPanel({
         {galleryOpen && (
           <div
             id={labelId}
-            className="map-controls__basemap-gallery"
+            className={styles.gallery}
             role="listbox"
             aria-label="Mapa base"
           >
@@ -87,8 +89,8 @@ export function MapControlsPanel({
                 aria-selected={option.id === basemapId}
                 className={
                   option.id === basemapId
-                    ? 'map-controls__basemap-item is-active'
-                    : 'map-controls__basemap-item'
+                    ? `${styles.basemapItem} ${styles.isActive}`
+                    : styles.basemapItem
                 }
                 onClick={() => {
                   onBasemapChange(option.id)
@@ -103,24 +105,26 @@ export function MapControlsPanel({
         )}
       </div>
 
-      <div className="map-controls__toggle" role="group" aria-label="Vista 2D o 3D">
-        <button
-          type="button"
-          className={viewMode === '2d' ? 'is-active' : undefined}
-          aria-pressed={viewMode === '2d'}
-          onClick={() => onViewModeChange('2d')}
-        >
-          2D
-        </button>
-        <button
-          type="button"
-          className={viewMode === '3d' ? 'is-active' : undefined}
-          aria-pressed={viewMode === '3d'}
-          onClick={() => onViewModeChange('3d')}
-        >
-          3D
-        </button>
-      </div>
+      {onViewModeChange && (
+        <div className={styles.viewToggle} role="group" aria-label="Vista 2D o 3D">
+          <button
+            type="button"
+            className={viewMode === '2d' ? styles.isActive : undefined}
+            aria-pressed={viewMode === '2d'}
+            onClick={() => onViewModeChange('2d')}
+          >
+            2D
+          </button>
+          <button
+            type="button"
+            className={viewMode === '3d' ? styles.isActive : undefined}
+            aria-pressed={viewMode === '3d'}
+            onClick={() => onViewModeChange('3d')}
+          >
+            3D
+          </button>
+        </div>
+      )}
     </aside>
   )
 }

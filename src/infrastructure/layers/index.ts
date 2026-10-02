@@ -6,7 +6,7 @@ import { createPoiLayer } from './poiLayer'
 import { createTrailsLayer } from './trailsLayer'
 import { createTemporaryPreschoolLayer } from './temporaryPreschoolLayer'
 
-export { getEntranceCoordinates, setPoiViewMode } from './poiLayer'
+export { setPoiViewMode } from './poiLayer'
 
 export interface OperationalLayers {
   layers: Layer[]

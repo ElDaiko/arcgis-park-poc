@@ -9,4 +9,9 @@ export default defineConfig({
     // que Vite lo pre-bundlee innecesariamente, acortando el cold start.
     exclude: ['@arcgis/core'],
   },
+  build: {
+    // Los chunks que superan 500 kB son internos de ArcGIS (SceneView,
+    // geometryEngine…) y ya se cargan bajo demanda por pestaña.
+    chunkSizeWarningLimit: 1000,
+  },
 })

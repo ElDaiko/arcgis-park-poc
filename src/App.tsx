@@ -1,42 +1,69 @@
-import { useState } from 'react'
-import './App.css'
-import { MapComponent } from './presentation/MapComponent'
-import { DensityMapPage } from './presentation/DensityMapPage'
-import { WebMapPage } from './presentation/WebMapPage'
-import { StyledWebMapPage } from './presentation/StyledWebMapPage'
+import { lazy, Suspense, useState, type ReactNode } from 'react'
+import styles from './App.module.scss'
+import { MapLoading } from './presentation/MapStatus'
 import { TabBar, type AppPage } from './presentation/TabBar'
+
+// Cada pestaña es un chunk propio: ArcGIS (MapView, SceneView, WebMap…) y sus
+// dependencias solo se descargan cuando el usuario abre la pestaña.
+const MapComponent = lazy(() =>
+  import('./presentation/MapComponent').then((m) => ({ default: m.MapComponent })),
+)
+const DensityMapPage = lazy(() =>
+  import('./presentation/DensityMapPage').then((m) => ({
+    default: m.DensityMapPage,
+  })),
+)
+const WebMapPage = lazy(() =>
+  import('./presentation/WebMapPage').then((m) => ({ default: m.WebMapPage })),
+)
+const StyledWebMapPage = lazy(() =>
+  import('./presentation/StyledWebMapPage').then((m) => ({
+    default: m.StyledWebMapPage,
+  })),
+)
+
+const PAGES: Record<AppPage, () => ReactNode> = {
+  map: () => <MapComponent />,
+  density: () => <DensityMapPage />,
+  webmap: () => <WebMapPage />,
+  'webmap-styled': () => <StyledWebMapPage />,
+}
+
+const PAGE_ORDER: AppPage[] = ['map', 'density', 'webmap', 'webmap-styled']
 
 function App() {
   const [activePage, setActivePage] = useState<AppPage>('map')
-  // Track whether the density tab has been visited at least once.
-  // This lazily mounts DensityMapPage the first time the user opens that tab,
-  // ensuring its map container already has real dimensions.
-  const [densityMounted, setDensityMounted] = useState(false)
-  const [webmapMounted, setWebmapMounted] = useState(false)
-  const [styledWebmapMounted, setStyledWebmapMounted] = useState(false)
+  // Cada página se monta la primera vez que se visita y luego se conserva
+  // (oculta) para no recrear la vista ArcGIS al cambiar de pestaña. Montarla
+  // al visitarla garantiza que su contenedor ya tiene dimensiones reales.
+  const [mountedPages, setMountedPages] = useState<ReadonlySet<AppPage>>(
+    () => new Set(['map']),
+  )
 
   const handlePageChange = (page: AppPage) => {
-    if (page === 'density') setDensityMounted(true)
-    if (page === 'webmap') setWebmapMounted(true)
-    if (page === 'webmap-styled') setStyledWebmapMounted(true)
+    setMountedPages((current) =>
+      current.has(page) ? current : new Set([...current, page]),
+    )
     setActivePage(page)
   }
 
   return (
-    <div className="app-root">
+    <div className={styles.root}>
       <TabBar activePage={activePage} onChange={handlePageChange} />
-      <div className={activePage === 'map' ? 'app-page is-visible' : 'app-page'}>
-        <MapComponent />
-      </div>
-      <div className={activePage === 'density' ? 'app-page is-visible' : 'app-page'}>
-        {densityMounted && <DensityMapPage />}
-      </div>
-      <div className={activePage === 'webmap' ? 'app-page is-visible' : 'app-page'}>
-        {webmapMounted && <WebMapPage />}
-      </div>
-      <div className={activePage === 'webmap-styled' ? 'app-page is-visible' : 'app-page'}>
-        {styledWebmapMounted && <StyledWebMapPage />}
-      </div>
+      {PAGE_ORDER.map((page) => (
+        <div
+          key={page}
+          className={
+            page === activePage ? `${styles.page} ${styles.isVisible}` : styles.page
+          }
+        >
+          {mountedPages.has(page) && (
+            <Suspense fallback={<MapLoading message="Cargando vista…" />}>
+              {PAGES[page]()}
+            </Suspense>
+          )}
+        </div>
+      ))}
     </div>
   )
 }
